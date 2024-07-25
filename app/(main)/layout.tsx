@@ -5,6 +5,10 @@ import { getTokens } from "next-firebase-auth-edge";
 import { cookies } from "next/headers";
 import { clientConfig, serverConfig } from "../config/firebase.config";
 import TokensProvider from "../context/tokens-provider";
+import MobileSimLink from "../components/shared/mobile-sim/mobile-sim-link";
+import MobileSimImage from "../components/shared/mobile-sim/mobile-sim-image";
+import MobileSimName from "../components/shared/mobile-sim/mobile-sim-name";
+import MobileSimEmail from "../components/shared/mobile-sim/mobile-sim-email";
 
 const MainLayout = async ({
   children,
@@ -25,19 +29,25 @@ const MainLayout = async ({
           <section className="bg-white rounded-xl w-[40%] flex items-center justify-center gap-10">
             <div className="relative">
               <Image
-                src={"/icons/phone-frame.svg"}
+                src={"/images/phone-frame.svg"}
                 width={307}
                 height={631}
                 alt="phone frame"
               />
-              <div className="w-[237px] absolute top-[63.5px] bottom-[53.5px] left-[34.5px] right-[35.5px]">
-                <div></div>
-                <div className="flex flex-col gap-y-5">
-                  <Skeleton
-                    paragraph={{ rows: 0 }}
-                    className="!w-full !h-11"
-                    rootClassName="!w-full !h-11"
-                  />
+              <div className="w-[237px] absolute top-[63.5px] bottom-[53.5px] left-[34.5px] right-[35.5px] flex flex-col justify-between items-center gap-y-14 no-scrollbar overflow-auto">
+                <div className="flex items-center flex-col w-full">
+                  <MobileSimImage skeleton className={`mb-[25px] size-24`} />
+                  <MobileSimName skeleton className={`mb-[13px]`} />
+                  <MobileSimEmail skeleton />
+                </div>
+                <div className="flex flex-col gap-y-5 w-full">
+                  <MobileSimLink skeleton />
+                  <MobileSimLink skeleton />
+                  <MobileSimLink skeleton />
+                  <MobileSimLink skeleton />
+                  <MobileSimLink skeleton />
+                  {/* <MobileSimLink skeleton />
+                  <MobileSimLink skeleton /> */}
                 </div>
               </div>
             </div>
@@ -45,7 +55,6 @@ const MainLayout = async ({
           <section className="bg-white rounded-xl w-[60%]">{children}</section>
         </div>
       </main>
-      //{" "}
     </TokensProvider>
   );
 };

@@ -114,7 +114,7 @@ const Login = () => {
         Login
       </Button>
       <p className="text-center body-m">
-        <span className="text-grey">Don't have an account?</span>
+        <span className="text-grey">Don&apos;t have an account?</span>
         <Link href={"/register"} className="text-primary">
           {" "}
           Create account

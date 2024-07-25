@@ -34,7 +34,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="p-6">
+    <nav className="p-6 sticky top-0 z-10">
       <div className="bg-white rounded-xl p-4 pl-6 flex items-center justify-between">
         <Logo variant="small" />
         <div className="flex items-center gap-x-4">

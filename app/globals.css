@@ -109,3 +109,16 @@ body {
 .ant-message-custom-content.ant-message-error .anticon {
   @apply !text-red;
 }
+
+.ant-select-selector:focus-within {
+  box-shadow: 0px 0px 32px 0px #633cff40 !important;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

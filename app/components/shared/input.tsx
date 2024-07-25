@@ -1,27 +1,20 @@
 "use client";
 
 import { cn } from "@/app/lib/utils";
-import { Input as AntInput, InputProps, InputRef } from "@/app/lib/antd";
-import { forwardRef, useImperativeHandle, useRef } from "react";
+import { Input as AntInput, InputProps } from "@/app/lib/antd";
 
 interface Props extends InputProps {
   label?: string;
   error?: string;
 }
 
-const Input = forwardRef<HTMLInputElement, Props>((props, ref) => {
+const Input = (props: Props) => {
   const { label, className, classNames, error, suffix, ...rest } = props;
-  const inputRef = useRef<InputRef>(null);
 
-  useImperativeHandle(
-    ref,
-    () => inputRef.current as unknown as HTMLInputElement
-  );
   return (
     <div className="flex flex-col gap-y-1 text-grey-dark body-s">
       {label && <span className="text-xs">{label}</span>}
       <AntInput
-        ref={inputRef}
         classNames={{
           ...classNames,
           prefix: cn("!mr-3", classNames?.prefix),
@@ -40,6 +33,6 @@ const Input = forwardRef<HTMLInputElement, Props>((props, ref) => {
       />
     </div>
   );
-});
+};
 
 export default Input;

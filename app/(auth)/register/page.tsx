@@ -17,7 +17,7 @@ const SignUpSchema = z
   .object({
     email: z.string().email().min(1, { message: "Can't be empty" }),
     password: z.string().min(1, { message: "Can't be empty" }),
-    confirmPassword: z.string().min(1, { message: "Can't be empty" }),
+    confirmPassword: z.string().min(8, { message: "Can't be empty" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "No match",

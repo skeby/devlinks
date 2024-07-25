@@ -20,6 +20,17 @@ export const theme: ThemeConfig = {
       colorPrimary: "#633CFF",
       primaryShadow: "none",
       colorPrimaryHover: "#BEADFF",
+      colorBgContainerDisabled: "#BEADFF",
+    },
+    Select: {
+      // colorTextPlaceholder: "#77878F",
+      borderRadius: 8,
+      colorPrimary: "#633CFF",
+      controlOutline: "#633CFF",
+      controlOutlineWidth: 0,
+      colorError: "#FF3939",
+      colorErrorHover: "#FF3939",
+      colorPrimaryHover: "#633CFF",
     },
   },
 };
