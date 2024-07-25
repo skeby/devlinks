@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Instrument_Sans } from "next/font/google";
+import { ConfigProvider } from "@/app/lib/antd";
+import { theme } from "./config/antd.config";
+import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const instrumentSans = Instrument_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,7 +19,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={instrumentSans.className}>
+        <ConfigProvider theme={theme}>
+          <NextTopLoader
+            color="#633CFF"
+            initialPosition={0.08}
+            crawlSpeed={200}
+            height={3}
+            crawl={true}
+            showSpinner={true}
+            easing="ease"
+            speed={200}
+            shadow="0 0 10px #633CFF,0 0 5px #633CFF"
+          />
+          {children}
+        </ConfigProvider>
+      </body>
     </html>
   );
 }

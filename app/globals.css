@@ -2,28 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+@layer base {
+  :root {
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 214, 219, 220;
+    --background-end-rgb: 255, 255, 255;
+
+    --primary: 252, 100%, 62%, 1;
+    --primary-hover: 252, 100%, 96%, 1;
+    --primary-light: 252, 100%, 96%, 1;
+
+    --grey: 0, 0%, 45%, 1;
+    --grey-light: 0, 0%, 98%, 1;
+    --grey-dark: 0, 0%, 20%, 1;
+
+    --border: 0, 0%, 85%, 1;
+
+    --white: 0, 0%, 100%, 1;
+    --red: 0, 100%, 61%, 1;
+  }
 }
 
+@layer components {
+  .default {
+    font-style: normal;
+  }
+
+  .heading-m {
+    @apply default font-bold;
+    font-size: 2rem;
+    line-height: 48px;
+  }
+
+  .heading-s {
+    @apply default font-semibold leading-6;
+    font-size: 1rem;
+  }
+
+  .body-m {
+    @apply default font-normal leading-6;
+    font-size: 1rem;
+  }
+
+  .body-s {
+    @apply default font-normal;
+    font-size: 0.75rem;
+    line-height: 18px;
+  }
+}
+/* 
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
   }
-}
+} */
 
 body {
+  @apply bg-grey-light;
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
 }
 
 @layer utilities {
