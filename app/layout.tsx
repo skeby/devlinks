@@ -19,6 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <link
+        rel="shortcut icon"
+        href="/icons/logo-icon.svg"
+        type="image/x-icon"
+      />
       <body className={instrumentSans.className}>
         <ConfigProvider theme={theme}>
           <NextTopLoader

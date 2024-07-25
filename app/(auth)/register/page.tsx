@@ -1,25 +1,41 @@
 "use client";
 
-import AuthForm from "@/app/components/auth-form";
+import AuthForm from "@/app/components/shared/auth-form";
 import Input from "@/app/components/shared/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EnvelopeSimple, LockKey } from "@phosphor-icons/react/dist/ssr";
-import { Button } from "@/app/lib/antd";
+import { Button, message } from "@/app/lib/antd";
 import Link from "next/link";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { app } from "@/app/firebase";
+import { useState } from "react";
+import useAppRouter from "@/app/hooks/useAppRouter";
 
-const SignUpSchema = z.object({
-  email: z.string().email().min(1, { message: "Can't be empty" }),
-  password: z.string().min(1, { message: "Can't be empty" }),
-  confirmPassword: z.string().min(1, { message: "Can't be empty" }),
-});
+const SignUpSchema = z
+  .object({
+    email: z.string().email().min(1, { message: "Can't be empty" }),
+    password: z.string().min(1, { message: "Can't be empty" }),
+    confirmPassword: z.string().min(1, { message: "Can't be empty" }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "No match",
+    path: ["confirmPassword"],
+  });
 
 type SignUpFields = z.infer<typeof SignUpSchema>;
 
 const SignUp = () => {
+  const [loading, setLoading] = useState(false);
+  const router = useAppRouter();
   const methods = useForm<SignUpFields>({
     resolver: zodResolver(SignUpSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
   });
 
   const {
@@ -28,7 +44,23 @@ const SignUp = () => {
     formState: { errors },
   } = methods;
 
-  const onSubmit: SubmitHandler<SignUpFields> = (data) => {};
+  const onSubmit: SubmitHandler<SignUpFields> = async (data) => {
+    setLoading(true);
+    try {
+      await createUserWithEmailAndPassword(
+        getAuth(app),
+        data.email,
+        data.password
+      );
+      message
+        .success("Account created successfully", 1)
+        .then(() => router.push("/login"));
+    } catch (e) {
+      message.error((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <AuthForm<SignUpFields>
       title="Create account"
@@ -75,7 +107,7 @@ const SignUp = () => {
           <Input
             value={value}
             onChange={onChange}
-            error={errors.password?.message}
+            error={errors.confirmPassword?.message}
             type="password"
             label="Confirm password"
             placeholder="Enter your password"
@@ -90,6 +122,8 @@ const SignUp = () => {
 
       {/* TODO: Fix background color on hover */}
       <Button
+        loading={loading}
+        htmlType="submit"
         type="primary"
         className="p-3 h-[46px] heading-s rounded-lg hover:!bg-[#BEADFF]"
       >

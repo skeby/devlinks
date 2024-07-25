@@ -1,6 +1,6 @@
 import Logo from "@/app/components/shared/logo";
 
-const AuthLayout = ({
+const AuthLayout = async ({
   children,
 }: Readonly<{
   children: React.ReactNode;

@@ -5,7 +5,7 @@
  */
 export const publicRoutes = ["/"];
 
-export const authRoutes = ["/signup", "/login"];
+export const authRoutes = ["/register", "/login"];
 
 export const apiAuthPrefix = "/api/";
 

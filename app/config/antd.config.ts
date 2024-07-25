@@ -1,7 +1,9 @@
 import { ThemeConfig } from "@/app/lib/antd";
 
 export const theme: ThemeConfig = {
-  token: {},
+  token: {
+    // fontFamily: "Instrument sans, sans-serif",
+  },
   components: {
     Input: {
       colorBorder: "#D9D9D9",
@@ -17,10 +19,7 @@ export const theme: ThemeConfig = {
     Button: {
       colorPrimary: "#633CFF",
       primaryShadow: "none",
-      // defaultHoverBg: "#BEADFF",
-      // colorPrimaryBgHover: "#BEADFF",
-      // defaultHoverColor: "#BEADFF",
-      // boxShadow: "0px 0px 32px 0px #633CFF40",
+      colorPrimaryHover: "#BEADFF",
     },
   },
 };

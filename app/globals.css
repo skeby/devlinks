@@ -69,3 +69,43 @@ body {
     text-wrap: balance;
   }
 }
+
+.ant-message {
+  color: #212121;
+  bottom: 40px !important;
+  top: initial !important;
+}
+
+.ant-message-custom-content {
+  column-gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.ant-message-notice,
+.ant-message-custom-content,
+.ant-message-notice-content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.ant-message-notice-content {
+  background-color: #333333 !important;
+  color: white;
+  min-height: 56px !important;
+  border-radius: 12px !important;
+  padding: 16px 24px !important;
+  box-shadow: 0px 0px 32px 0px #0000001a !important;
+}
+
+/* custom-message.css */
+.ant-message-custom-content.ant-message-success .anticon,
+.ant-message-custom-content.ant-message-info .anticon {
+  @apply !text-primary;
+}
+
+.ant-message-custom-content.ant-message-error .anticon {
+  @apply !text-red;
+}

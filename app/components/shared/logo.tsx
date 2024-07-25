@@ -14,14 +14,14 @@ const Logo = ({ variant = "default" }: Props) => {
       }`}
     >
       <Image
-        src="/logo-icon.svg"
-        alt="devlinks logo"
+        src="/icons/logo-icon.svg"
+        alt="devlinks "
         width={variant === "default" ? 40 : 32}
         height={variant === "default" ? 40 : 32}
         priority
       />
       <Image
-        src="/logo-text.svg"
+        src="/icons/logo-text.svg"
         alt="devlinks logo"
         width={variant === "default" ? 135 : 108}
         height={variant === "default" ? 26.25 : 21}
