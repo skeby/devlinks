@@ -14,13 +14,23 @@ interface Props {
   onRemove: () => void;
 }
 
-export const PlatformOptionLabel = ({ text }: { text: string }) => (
+const PlatformOptionLabel = ({
+  text,
+  icon,
+}: {
+  text: string;
+  icon: string;
+}) => (
   <div className="flex items-center gap-x-3 h-6">
     <Image
       width={16}
       height={16}
-      src={`/icons/${text.toLowerCase().replaceAll(" ", "-")}.svg`}
+      src={`/icons/${icon}`}
       alt={`${text.toLowerCase()} icon`}
+      style={{
+        color: "#737373",
+        fill: "#737373",
+      }}
       className=""
     />
     <span className="">{text}</span>
@@ -66,7 +76,12 @@ const LinkField = ({ control, index, onRemove }: Props) => {
               value={value}
               onChange={onChange}
               label="Platform"
-              options={platformOptions}
+              options={platformOptions.map((option) => ({
+                label: (
+                  <PlatformOptionLabel text={option.label} icon={option.icon} />
+                ),
+                value: option.value,
+              }))}
               className="!text-base"
               rootClassName="!text-base"
             />

@@ -1,6 +1,8 @@
 import { cn } from "@/app/lib/utils";
 import { ReactNode } from "react";
 import { MobileSimProps } from ".";
+import Image from "next/image";
+import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 
 interface Props extends MobileSimProps {
   title?: string;
@@ -17,20 +19,37 @@ const MobileSimLink = ({
   icon,
   color,
 }: Props) => {
+  if (skeleton)
+    return (
+      <div className="bg-[#EEEEEE] h-11 px-4 py-3.5 w-full rounded-lg"></div>
+    );
   return (
     <a
-      href={href || "#"}
-      target={href && !skeleton ? "_blank" : undefined}
+      href={href || ""}
+      target={href ? "_blank" : undefined}
       style={{
-        backgroundColor: color,
+        backgroundColor: color || "#633CFF",
       }}
       className={cn(
-        `rounded-lg h-11 w-full ${skeleton ? "bg-[#EEEEEE]" : ""}`,
+        "rounded-lg h-11 w-full text-white px-4 py-3.5 text-xs",
         className
       )}
     >
-      {icon}
-      {title}
+      <div className="flex items-center gap-x-2">
+        <Image
+          width={16}
+          height={16}
+          src={`/icons/${icon}`}
+          alt={`${title} icon`}
+          className="text-white"
+          style={{
+            color: "#ffffff",
+            fill: "#ffffff",
+          }}
+        />
+        <span className="flex-grow">{title}</span>
+        <ArrowRightIcon className="size-4" />
+      </div>
     </a>
   );
 };

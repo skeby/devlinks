@@ -9,7 +9,7 @@ interface Props<T extends AnyObject> {
   subtitle: string;
   children: ReactNode;
   onSubmit: SubmitHandler<T>;
-  handleSubmit: UseFormHandleSubmit<T, undefined>;
+  handleSubmit: UseFormHandleSubmit<T>;
 }
 
 const AuthForm = <T extends AnyObject>({

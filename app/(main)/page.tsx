@@ -46,8 +46,8 @@ const Links = () => {
   };
 
   return (
-    <div className="flex gap-x-6 px-6 flex-1 pb-6">
-      <section className="bg-white h-fit rounded-xl w-[40%] flex justify-center gap-10 py-10">
+    <div className="flex relative gap-x-6 px-6 flex-1 pb-6">
+      <section className="bg-white sticky top-20 h-fit rounded-xl w-[40%] flex justify-center gap-10 py-10">
         <div className="relative">
           <Image
             src={"/images/phone-frame.svg"}
@@ -72,7 +72,9 @@ const Links = () => {
                   return (
                     <MobileSimLink
                       key={index}
-                      title={platform?.title}
+                      title={platform?.label}
+                      color={platform?.color}
+                      icon={platform?.icon}
                       href={field.link}
                     />
                   );
