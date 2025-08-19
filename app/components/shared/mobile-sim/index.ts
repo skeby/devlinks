@@ -1,4 +1,4 @@
 export interface MobileSimProps {
-  skeleton: boolean;
+  skeleton?: boolean;
   className?: string;
 }

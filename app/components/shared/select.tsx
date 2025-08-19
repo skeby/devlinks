@@ -3,7 +3,7 @@
 "use client";
 
 import { cn } from "@/app/lib/utils";
-import { Select as AntSelect, SelectProps } from "@/app/lib/antd";
+import { Select as AntSelect, SelectProps } from "antd";
 import Image from "next/image";
 
 interface Props extends SelectProps {
@@ -20,7 +20,7 @@ const Select = (props: Props) => {
       {label && <span className="text-xs">{label}</span>}
       <AntSelect
         className={cn(
-          `w-full h-12 text-grey-dark body-m leading-6 ${
+          `w-full !h-12 text-grey-dark body-m leading-6 ${
             error ? "border-red hover:border-red" : ""
           }`,
           className
@@ -38,10 +38,14 @@ const Select = (props: Props) => {
           )
         }
         // TODO: Sort out margin top
-        popupClassName={cn(
-          "mt-4 border border-[#D9D9D9] rounded-lg !shadow-[0px_0px_32px_0px_#0000001A]",
-          popupClassName
-        )}
+        classNames={{
+          popup: {
+            root: cn(
+              "mt-4 border border-[#D9D9D9] rounded-lg !shadow-[0px_0px_32px_0px_#0000001A]",
+              popupClassName
+            ),
+          },
+        }}
         {...rest}
       />
     </div>

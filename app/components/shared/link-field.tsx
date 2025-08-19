@@ -3,19 +3,18 @@ import Input from "./input";
 import { Link } from "@phosphor-icons/react/dist/ssr";
 import Select from "./select";
 import { Control, Controller } from "react-hook-form";
-import { LinkFields } from "@/app/(main)/links/page";
+import { LinkFields } from "@/app/(main)/page";
 import { ReactNode } from "react";
 import { ConfigProvider } from "antd";
+import { platformOptions } from "@/app/static";
 
 interface Props {
   index: number;
-  platform: string;
-  link: string;
   control: Control<LinkFields, any>;
   onRemove: () => void;
 }
 
-const PlatformOptionLabel = ({ text }: { text: string }) => (
+export const PlatformOptionLabel = ({ text }: { text: string }) => (
   <div className="flex items-center gap-x-3 h-6">
     <Image
       width={16}
@@ -28,65 +27,7 @@ const PlatformOptionLabel = ({ text }: { text: string }) => (
   </div>
 );
 
-const LinkField = ({ platform, control, link, index, onRemove }: Props) => {
-  const platformOptions = [
-    {
-      label: <PlatformOptionLabel text="GitHub" />,
-      value: "github",
-    },
-    {
-      label: <PlatformOptionLabel text="Frontend Mentor" />,
-      value: "frontend-mentor",
-    },
-    {
-      label: <PlatformOptionLabel text="Twitter" />,
-      value: "twitter",
-    },
-    {
-      label: <PlatformOptionLabel text="LinkedIn" />,
-      value: "linkedin",
-    },
-    {
-      label: <PlatformOptionLabel text="YouTube" />,
-      value: "youtube",
-    },
-    {
-      label: <PlatformOptionLabel text="Facebook" />,
-      value: "Facebook",
-    },
-    {
-      label: <PlatformOptionLabel text="Twitch" />,
-      value: "Twitch",
-    },
-    {
-      label: <PlatformOptionLabel text="Dev.to" />,
-      value: "Dev.to",
-    },
-    {
-      label: <PlatformOptionLabel text="Codewars" />,
-      value: "Codewars",
-    },
-    {
-      label: <PlatformOptionLabel text="Codepen" />,
-      value: "Codepen",
-    },
-    {
-      label: <PlatformOptionLabel text="freeCodeCamp" />,
-      value: "freeCodeCamp",
-    },
-    {
-      label: <PlatformOptionLabel text="GitLab" />,
-      value: "GitLab",
-    },
-    {
-      label: <PlatformOptionLabel text="Hashnode" />,
-      value: "Hashnode",
-    },
-    {
-      label: <PlatformOptionLabel text="Stack Overflow" />,
-      value: "stack-overflow",
-    },
-  ];
+const LinkField = ({ control, index, onRemove }: Props) => {
   return (
     <div className="rounded-xl p-5 bg-grey-light flex flex-col gap-y-3">
       <div className="flex items-center justify-between text-grey">
@@ -117,13 +58,19 @@ const LinkField = ({ platform, control, link, index, onRemove }: Props) => {
         }}
       >
         {/* TODO: Make the design of the options rendered pixel perfect */}
-        <Select
-          label="Platform"
-          options={platformOptions}
-          className="!text-base"
-          rootClassName="!text-base"
-          // optionRender={({ label }) => <div>{label}</div>}
-          // optionLabelProp="sa"
+        <Controller
+          control={control}
+          name={`fields.${index}.platform`}
+          render={({ field: { onChange, value } }) => (
+            <Select
+              value={value}
+              onChange={onChange}
+              label="Platform"
+              options={platformOptions}
+              className="!text-base"
+              rootClassName="!text-base"
+            />
+          )}
         />
       </ConfigProvider>
       <Controller

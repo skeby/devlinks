@@ -3,7 +3,7 @@
 import { SignOut } from "@phosphor-icons/react";
 import Logo from "../shared/logo";
 import { Link as ILink, UserCircle } from "@phosphor-icons/react/dist/ssr";
-import { Button } from "@/app/lib/antd";
+import { Button } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getAuth, signOut } from "firebase/auth";
@@ -17,7 +17,7 @@ const Navbar = () => {
   const navLinks = [
     {
       title: "Links",
-      href: "/links",
+      href: "/",
       icon: <ILink size={16} weight="bold" />,
     },
     {
@@ -65,7 +65,7 @@ const Navbar = () => {
           </Link>
           <Button
             type="primary"
-            className="h-12 w-12 px-3.5 rounded-lg"
+            className="!h-12 !w-12 !px-3.5 !rounded-lg"
             onClick={handleLogout}
           >
             <SignOut size={24} weight="bold" />

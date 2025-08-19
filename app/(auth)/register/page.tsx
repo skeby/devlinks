@@ -4,7 +4,7 @@ import AuthForm from "@/app/components/shared/auth-form";
 import Input from "@/app/components/shared/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EnvelopeSimple, LockKey } from "@phosphor-icons/react/dist/ssr";
-import { Button, message } from "@/app/lib/antd";
+import { Button, message } from "antd";
 import Link from "next/link";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -125,7 +125,7 @@ const SignUp = () => {
         loading={loading}
         htmlType="submit"
         type="primary"
-        className="p-3 h-[46px] heading-s rounded-lg hover:!bg-[#BEADFF]"
+        className="!p-3 !h-[46px] heading-s !rounded-lg hover:!bg-[#BEADFF]"
       >
         Create new account
       </Button>

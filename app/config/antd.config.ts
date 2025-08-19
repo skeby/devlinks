@@ -1,4 +1,4 @@
-import { ThemeConfig } from "@/app/lib/antd";
+import { ThemeConfig } from "antd";
 
 export const theme: ThemeConfig = {
   token: {

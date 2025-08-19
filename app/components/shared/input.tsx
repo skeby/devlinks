@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/app/lib/utils";
-import { Input as AntInput, InputProps } from "@/app/lib/antd";
+import { Input as AntInput, InputProps } from "antd";
 
 interface Props extends InputProps {
   label?: string;
@@ -21,7 +21,7 @@ const Input = (props: Props) => {
           input: cn("placeholder:text-[#999999]", classNames?.input),
         }}
         className={cn(
-          `rounded-lg px-4 h-12 py-3 text-grey-dark body-m leading-6 ${
+          `!rounded-lg px-4 !h-12 !py-3 text-grey-dark body-m leading-6 ${
             error ? "border-red hover:border-red" : ""
           }`,
           className

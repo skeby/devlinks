@@ -4,7 +4,7 @@ import { z } from "zod";
 import AuthForm from "@/app/components/shared/auth-form";
 import Input from "@/app/components/shared/input";
 import { EnvelopeSimple, LockKey } from "@phosphor-icons/react/dist/ssr";
-import { Button, message } from "@/app/lib/antd";
+import { Button, message } from "antd";
 import Link from "next/link";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -56,7 +56,7 @@ const Login = () => {
         },
       });
 
-      message.success("Login successful", 1).then(() => router.push("/links"));
+      message.success("Login successful", 1).then(() => router.push("/"));
     } catch (e) {
       message.error((e as Error).message);
     } finally {
@@ -108,7 +108,7 @@ const Login = () => {
         htmlType="submit"
         // form="auth-form"
         type="primary"
-        className="p-3 h-[46px] heading-s rounded-lg"
+        className="!p-3 !h-[46px] heading-s !rounded-lg"
         // onClick={handleSubmit(onSubmit)}
       >
         Login

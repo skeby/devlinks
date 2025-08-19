@@ -6,6 +6,7 @@ interface Props extends MobileSimProps {
   title?: string;
   href?: string;
   icon?: ReactNode;
+  color?: string;
 }
 
 const MobileSimLink = ({
@@ -14,13 +15,17 @@ const MobileSimLink = ({
   href,
   className,
   icon,
+  color,
 }: Props) => {
   return (
     <a
-      href={href}
-      target="_blank"
+      href={href || "#"}
+      target={href && !skeleton ? "_blank" : undefined}
+      style={{
+        backgroundColor: color,
+      }}
       className={cn(
-        `rounded-lg ${skeleton ? "bg-[#EEEEEE] h-11 w-full" : ""}`,
+        `rounded-lg h-11 w-full ${skeleton ? "bg-[#EEEEEE]" : ""}`,
         className
       )}
     >

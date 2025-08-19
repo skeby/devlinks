@@ -1,5 +1,5 @@
 {
-  "name": "hng11-stage-5",
+  "name": "devlinks",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,17 +10,20 @@
     "lint:fix": "next lint --fix"
   },
   "dependencies": {
+    "@ant-design/nextjs-registry": "^1.1.0",
+    "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@hookform/resolvers": "^3.9.0",
     "@phosphor-icons/react": "^2.1.7",
-    "antd": "^5.19.3",
+    "@vercel/analytics": "^1.5.0",
+    "antd": "^5.19.4",
     "clsx": "^2.1.1",
     "firebase": "^10.12.4",
-    "next": "14.2.5",
+    "next": "15.4.7",
     "next-firebase-auth-edge": "^1.6.2",
     "nextjs-toploader": "^1.6.12",
     "nprogress": "^0.2.0",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "react-hook-form": "^7.52.1",
     "tailwind-merge": "^2.4.0",
     "zod": "^3.23.8"
@@ -30,7 +33,7 @@
     "@types/nprogress": "^0.2.3",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "eslint": "^8",
+    "eslint": "^9.33.0",
     "eslint-config-next": "14.2.5",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
