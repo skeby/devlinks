@@ -6,7 +6,7 @@ const AuthLayout = async ({
   children: React.ReactNode;
 }>) => {
   return (
-    <div className="flex min-h-screen w-full flex-col justify-center items-center bg-grey-light gap-y-[51px]">
+    <div className="flex min-h-screen w-full flex-col sm:py-10 py-8 px-4 sm:px-10 justify-center items-center bg-grey-light gap-y-[51px]">
       <Logo />
       {children}
     </div>

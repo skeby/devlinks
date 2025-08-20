@@ -3,7 +3,7 @@
 import AuthForm from "@/app/components/shared/auth-form";
 import Input from "@/app/components/shared/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { EnvelopeSimple, LockKey } from "@phosphor-icons/react/dist/ssr";
+import { EnvelopeSimple, LockKey } from "@phosphor-icons/react";
 import { Button, message } from "antd";
 import Link from "next/link";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";

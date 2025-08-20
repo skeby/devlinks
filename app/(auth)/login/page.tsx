@@ -3,7 +3,7 @@
 import { z } from "zod";
 import AuthForm from "@/app/components/shared/auth-form";
 import Input from "@/app/components/shared/input";
-import { EnvelopeSimple, LockKey } from "@phosphor-icons/react/dist/ssr";
+import { EnvelopeSimpleIcon, LockKeyIcon } from "@phosphor-icons/react";
 import { Button, message } from "antd";
 import Link from "next/link";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -82,7 +82,11 @@ const Login = () => {
             label="Email address"
             placeholder="e.g. alex@email.com"
             prefix={
-              <EnvelopeSimple size={16} weight="fill" className="text-grey" />
+              <EnvelopeSimpleIcon
+                size={16}
+                weight="fill"
+                className="text-grey"
+              />
             }
           />
         )}
@@ -98,7 +102,9 @@ const Login = () => {
             type="password"
             label="Password"
             placeholder="Enter your password"
-            prefix={<LockKey size={16} weight="fill" className="text-grey" />}
+            prefix={
+              <LockKeyIcon size={16} weight="fill" className="text-grey" />
+            }
           />
         )}
       />

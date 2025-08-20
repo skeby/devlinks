@@ -16,18 +16,18 @@ const Select = (props: Props) => {
     props;
 
   return (
-    <div className="flex flex-col w-full gap-y-1 text-grey-dark body-s">
+    <div className="body-s flex w-full flex-col gap-y-1 text-grey-dark">
       {label && <span className="text-xs">{label}</span>}
       <AntSelect
         className={cn(
-          `w-full !h-12 text-grey-dark body-m leading-6 ${
-            error ? "border-red hover:border-red" : ""
+          `body-m !h-12 w-full leading-6 ${
+            error ? "!text-[#FF3939]" : "text-grey-dark"
           }`,
-          className
+          className,
         )}
         suffixIcon={
           error ? (
-            <span className="body-s text-red">{error}</span>
+            <span className="body-s text-[#FF3939]">{error}</span>
           ) : (
             <Image
               width={12}
@@ -41,8 +41,9 @@ const Select = (props: Props) => {
         classNames={{
           popup: {
             root: cn(
-              "mt-4 border border-[#D9D9D9] rounded-lg !shadow-[0px_0px_32px_0px_#0000001A]",
-              popupClassName
+              // TODO: Sort out border not showing when there is error
+              `mt-4 rounded-lg ${error ? "!border-[#FF3939] !shadow-none hover:!border-[#FF3939]" : "!shadow-[0px_0px_32px_0px_#0000001A] border border-[#D9D9D9]"}`,
+              popupClassName,
             ),
           },
         }}

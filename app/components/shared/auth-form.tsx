@@ -23,7 +23,7 @@ const AuthForm = <T extends AnyObject>({
     <form
       onSubmit={handleSubmit(onSubmit)}
       id="auth-form"
-      className="sm:w-[476px] bg-white rounded-xl p-10 flex flex-col gap-y-10"
+      className="max-w-[476px] w-full bg-white rounded-xl p-10 flex flex-col gap-y-10"
     >
       <div>
         <p className="heading-m text-grey-dark mb-2">{title}</p>

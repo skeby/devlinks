@@ -20,6 +20,16 @@ const LinkFieldsSchema = z.object({
       platform: z.string().min(1, { message: "Can't be empty" }),
       link: z.string().min(1, { message: "Can't be empty" }),
     })
+    .refine(
+      (field) =>
+        platformOptions
+          .find((option) => option.value === field.platform)
+          ?.regex.test(field.link) || false,
+      {
+        message: "Please check the URL",
+        path: ["link"],
+      }
+    )
     .array(),
 });
 
@@ -144,6 +154,7 @@ const Links = () => {
                       <LinkField
                         index={index}
                         key={field.id}
+                        platform={field.platform}
                         control={control}
                         onRemove={() => remove(index)}
                       />
@@ -157,7 +168,7 @@ const Links = () => {
             <Button
               htmlType="submit"
               type="primary"
-              disabled={true}
+              disabled={false}
               className="float-right !h-auto !py-[11px] !px-[27px] heading-s !rounded-lg disabled:!bg-[#633CFF40] disabled:!text-white"
             >
               Save

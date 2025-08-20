@@ -1,8 +1,7 @@
 "use client";
 
-import { SignOut } from "@phosphor-icons/react";
+import { SignOutIcon, LinkIcon, UserCircleIcon } from "@phosphor-icons/react";
 import Logo from "../shared/logo";
-import { Link as ILink, UserCircle } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -18,12 +17,12 @@ const Navbar = () => {
     {
       title: "Links",
       href: "/",
-      icon: <ILink size={16} weight="bold" />,
+      icon: <LinkIcon size={16} weight="bold" />,
     },
     {
       title: "Profile Details",
-      href: "/profile",
-      icon: <UserCircle size={16} weight="bold" />,
+      href: "/profile-details",
+      icon: <UserCircleIcon size={16} weight="bold" />,
     },
   ];
 
@@ -68,7 +67,7 @@ const Navbar = () => {
             className="!h-12 !w-12 !px-3.5 !rounded-lg"
             onClick={handleLogout}
           >
-            <SignOut size={24} weight="bold" />
+            <SignOutIcon size={24} weight="bold" />
           </Button>
         </div>
       </div>

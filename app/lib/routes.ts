@@ -20,4 +20,4 @@ export const DEFAULT_LOGIN_REDIRECT = "/dashboard";
  * These routes require authentication
  * @type {string[]}
  */
-export const clientRoutes = ["/", "/profile"];
+export const clientRoutes = ["/", "/profile-details"];

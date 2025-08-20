@@ -12,7 +12,7 @@ const Input = (props: Props) => {
   const { label, className, classNames, error, suffix, ...rest } = props;
 
   return (
-    <div className="flex flex-col gap-y-1 text-grey-dark body-s">
+    <div className="body-s flex flex-col gap-y-1 text-grey-dark">
       {label && <span className="text-xs">{label}</span>}
       <AntInput
         classNames={{
@@ -21,13 +21,19 @@ const Input = (props: Props) => {
           input: cn("placeholder:text-[#999999]", classNames?.input),
         }}
         className={cn(
-          `!rounded-lg px-4 !h-12 !py-3 text-grey-dark body-m leading-6 ${
-            error ? "border-red hover:border-red" : ""
+          `body-m !h-12 !rounded-lg !py-3 px-4 leading-6 ${
+            error
+              ? "!border-[#FF3939] !text-[#FF3939] !shadow-none hover:!border-[#FF3939]"
+              : "text-grey-dark"
           }`,
-          className
+          className,
         )}
         suffix={
-          error ? <span className="body-s text-red">{error}</span> : suffix
+          error ? (
+            <span className="body-s text-[#FF3939]">{error}</span>
+          ) : (
+            suffix
+          )
         }
         {...rest}
       />

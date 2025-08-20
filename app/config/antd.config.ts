@@ -2,7 +2,7 @@ import { ThemeConfig } from "antd";
 
 export const theme: ThemeConfig = {
   token: {
-    // fontFamily: "Instrument sans, sans-serif",
+    fontFamily: "Instrument sans, sans-serif",
   },
   components: {
     Input: {
