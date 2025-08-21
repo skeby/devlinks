@@ -8,8 +8,10 @@ import { usePathname } from "next/navigation";
 import { getAuth, signOut } from "firebase/auth";
 import { app } from "@/app/firebase";
 import useAppRouter from "@/app/hooks/useAppRouter";
+import { useTokens } from "@/app/context/tokens";
 
 const Navbar = () => {
+  const tokens = useTokens();
   const pathname = usePathname();
   const router = useAppRouter();
 
@@ -33,8 +35,8 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="p-6 sticky top-0 z-10">
-      <div className="bg-white rounded-xl p-4 pl-6 flex items-center justify-between">
+    <nav className="sticky top-0 z-10 p-6">
+      <div className="flex items-center justify-between rounded-xl bg-white p-4 pl-6">
         <Logo variant="small" />
         <div className="flex items-center gap-x-4">
           {navLinks.map((link, i) => {
@@ -43,9 +45,9 @@ const Navbar = () => {
               <Link
                 key={i}
                 {...link}
-                className={`py-[11px] px-[27px] heading-s flex items-center gap-x-2 ${
+                className={`heading-s flex items-center gap-x-2 px-[27px] py-[11px] ${
                   isActive
-                    ? "bg-primary-light rounded-lg text-primary"
+                    ? "rounded-lg bg-primary-light text-primary"
                     : "text-grey"
                 }`}
               >
@@ -57,14 +59,14 @@ const Navbar = () => {
         </div>
         <div className="flex items-center gap-x-4">
           <Link
-            href={"/preview"}
-            className="heading-s text-primary py-[11px] px-[27px] rounded-lg border border-primary"
+            href={`/u/${tokens?.decodedToken.uid || ""}`}
+            className="heading-s h-[46px] rounded-lg border border-primary px-[27px] py-[9px] font-semibold text-primary"
           >
             Preview
           </Link>
           <Button
             type="primary"
-            className="!h-12 !w-12 !px-3.5 !rounded-lg"
+            className="!h-[46px] !w-[46px] !rounded-lg !px-3.5"
             onClick={handleLogout}
           >
             <SignOutIcon size={24} weight="bold" />

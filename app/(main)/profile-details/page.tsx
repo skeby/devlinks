@@ -13,12 +13,7 @@ import ImgCrop from "antd-img-crop";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { ImageIcon } from "@phosphor-icons/react";
-import {
-  Controller,
-  SubmitHandler,
-  useFieldArray,
-  useForm,
-} from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import MobileSimEmail from "@/app/components/shared/mobile-sim/mobile-sim-email";
 import MobileSimImage from "@/app/components/shared/mobile-sim/mobile-sim-image";
@@ -27,7 +22,13 @@ import MobileSimName from "@/app/components/shared/mobile-sim/mobile-sim-name";
 import { platformOptions } from "@/app/static";
 import Input from "@/app/components/shared/input";
 import { RcFile } from "antd/es/upload";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { LinkFields } from "../page";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { app, db, storage } from "@/app/firebase";
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import FloppyDiskIcon from "../../../public/icons/floppy-disk.svg";
 
 const ProfileDetailsSchema = z.object({
   profilePicture: z.string().optional(),
@@ -50,12 +51,90 @@ const Settings = () => {
         email: "",
       },
     });
+
   const profilePicture = watch("profilePicture");
+  const firstName = watch("firstName");
+  const lastName = watch("lastName");
+  const email = watch("email");
 
-  const fields = [] as any[];
+  const [fields, setFields] = useState<LinkFields["fields"]>([]);
+  const [newProfileFile, setNewProfileFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit: SubmitHandler<ProfileDetailsFields> = (data) => {
-    console.log(data);
+  useEffect(() => {
+    const auth = getAuth(app);
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const userDocRef = doc(db, "users", user.uid);
+
+        const unsubscribeDoc = onSnapshot(userDocRef, (snap) => {
+          if (snap.exists()) {
+            const data = snap.data();
+            const firestoreLinks = data.links || [];
+
+            // Only reset if values are different
+            if (JSON.stringify(firestoreLinks) !== JSON.stringify(fields)) {
+              setFields(firestoreLinks);
+            }
+
+            // load profile picture & form values
+            setValue("profilePicture", data.profilePicture || "");
+            setValue("firstName", data.firstName || "");
+            setValue("lastName", data.lastName || "");
+            setValue("email", data.email || "");
+          }
+        });
+
+        return () => unsubscribeDoc();
+      }
+    });
+
+    return () => unsubscribeAuth();
+  }, [setValue]);
+
+  const onSubmit: SubmitHandler<ProfileDetailsFields> = async (data) => {
+    const decodedToken = tokens?.decodedToken;
+    if (!decodedToken) return;
+    setLoading(true);
+
+    try {
+      let photoURL = data.profilePicture;
+
+      // 👇 Only upload if a new file is picked
+      if (newProfileFile) {
+        // ✅ Always overwrite the same path, so old pic is replaced
+        const storageRef = ref(
+          storage,
+          `users/${decodedToken.uid}/profile.jpg`,
+        );
+
+        // Upload (overwrite if already exists)
+        await uploadBytes(storageRef, newProfileFile);
+
+        // Get fresh download URL
+        photoURL = await getDownloadURL(storageRef);
+      }
+
+      // ✅ Update Firestore
+      const userDocRef = doc(db, "users", decodedToken.uid);
+      await updateDoc(userDocRef, {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        profilePicture: photoURL || null,
+      });
+
+      message.success({
+        content: "Your changes have been successfully saved!",
+        icon: <FloppyDiskIcon />,
+      });
+      setNewProfileFile(null); // reset temp file
+    } catch (err: any) {
+      message.error(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onImagePreview = async (file: UploadFile) => {
@@ -98,15 +177,12 @@ const Settings = () => {
       reader.onload = (e) => {
         const img = new window.Image();
         img.onload = () => {
-          console.log(`${img.width}x${img.height}`);
-          resolve(true);
-
-          // if (img.width > 1024 || img.height > 1024) {
-          //   message.error("Image must be below 1024x1024px");
-          //   resolve(false);
-          // } else {
-          //   resolve(true);
-          // }
+          if (img.width / img.height !== 1) {
+            message.error("Image must be aspect ratio 1:1");
+            resolve(false);
+          } else {
+            resolve(true);
+          }
         };
         img.onerror = () => resolve(false);
         img.src = e.target?.result as string;
@@ -117,9 +193,10 @@ const Settings = () => {
     if (isValidDimensions) {
       const blobUrl = URL.createObjectURL(file);
       setValue("profilePicture", blobUrl);
+      setNewProfileFile(file); // 👈 store file for later upload
     }
 
-    return isValidDimensions;
+    return false;
   };
 
   return (
@@ -127,6 +204,7 @@ const Settings = () => {
       <section className="sticky top-20 flex h-fit w-[40%] justify-center gap-10 rounded-xl bg-white py-10">
         <div className="relative">
           <Image
+            priority
             src={"/images/phone-frame.svg"}
             width={307}
             height={631}
@@ -134,28 +212,29 @@ const Settings = () => {
           />
           <div className="no-scrollbar absolute bottom-[53.5px] left-[34.5px] right-[35.5px] top-[63.5px] flex w-[237px] flex-col items-center justify-between gap-y-14 overflow-auto">
             <div className="flex w-full flex-col items-center">
-              <MobileSimImage skeleton className={`mb-[25px] size-24`} />
-              <MobileSimName skeleton className={`mb-[13px]`} />
-              <MobileSimEmail skeleton />
+              <MobileSimImage
+                skeleton={!profilePicture}
+                src={profilePicture}
+                className={`mb-[25px]`}
+              />
+              <MobileSimName
+                skeleton={!firstName || !lastName}
+                name={`${firstName || ""} ${lastName || ""}`}
+                className={`mb-[13px]`}
+              />
+              <MobileSimEmail skeleton={!email} name={email} />
             </div>
             <div className="flex w-full flex-col gap-y-5">
               {fields
                 .filter((field) => field.platform) // Only include fields with a selected platform
                 .slice(0, 5) // Limit to 5 items
-                .map((field, index) => {
-                  const platform = platformOptions.find(
-                    (o) => o.value === field.platform,
-                  );
-                  return (
-                    <MobileSimLink
-                      key={index}
-                      title={platform?.label}
-                      color={platform?.color}
-                      icon={platform?.icon}
-                      href={field.link}
-                    />
-                  );
-                })}
+                .map((field, index) => (
+                  <MobileSimLink
+                    key={index}
+                    href={field.link}
+                    platform={field.platform}
+                  />
+                ))}
               {Array.from({
                 length: 5 - fields.filter((field) => field.platform).length,
               }).map((_, index) => (
@@ -214,6 +293,7 @@ const Settings = () => {
                         {profilePicture && (
                           <>
                             <Image
+                              priority
                               alt="Profile picture"
                               src={profilePicture}
                               width={193}
@@ -299,6 +379,7 @@ const Settings = () => {
                       fieldState: { error },
                     }) => (
                       <Input
+                        disabled
                         name="email"
                         value={value}
                         onChange={onChange}
@@ -314,7 +395,7 @@ const Settings = () => {
           </div>
           <div className="border-t border-[#D9D9D9] px-10 py-6">
             <Button
-              loading={false}
+              loading={loading}
               htmlType="submit"
               type="primary"
               disabled={false}

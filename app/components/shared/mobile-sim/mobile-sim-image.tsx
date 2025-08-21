@@ -7,9 +7,23 @@ interface Props extends MobileSimProps {
 }
 
 const MobileSimImage = ({ className, skeleton, src }: Props) => {
-  if (!src || skeleton)
-    return <div className={cn("bg-[#EEEEEE] rounded-full", className)}></div>;
-  return <Image src={src} className={cn("", className)} alt="profile image" />;
+  if (skeleton || !src)
+    return (
+      <div className={cn("size-24 rounded-full bg-[#EEEEEE]", className)}></div>
+    );
+  return (
+    <Image
+      priority
+      src={src}
+      width={96}
+      height={96}
+      className={cn(
+        "size-24 rounded-full border-4 border-primary object-cover",
+        className,
+      )}
+      alt="Profile image"
+    />
+  );
 };
 
 export default MobileSimImage;

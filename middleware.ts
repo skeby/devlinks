@@ -8,6 +8,12 @@ import { clientConfig, serverConfig } from "./app/config/firebase.config";
 
 const PUBLIC_PATHS = ["/register", "/login"];
 
+function isPublicPath(path: string) {
+  return (
+    PUBLIC_PATHS.includes(path) || path.startsWith("/u/") // ✅ allow /u/[uid] pages
+  );
+}
+
 export async function middleware(request: NextRequest) {
   return authMiddleware(request, {
     loginPath: "/api/login",
@@ -18,8 +24,13 @@ export async function middleware(request: NextRequest) {
     cookieSerializeOptions: serverConfig.cookieSerializeOptions,
     serviceAccount: serverConfig.serviceAccount,
     handleValidToken: async ({ token, decodedToken }, headers) => {
-      if (PUBLIC_PATHS.includes(request.nextUrl.pathname)) {
-        return redirectToHome(request);
+      if (isPublicPath(request.nextUrl.pathname)) {
+        // If user is logged in and visits public path, let them stay
+        return NextResponse.next({
+          request: {
+            headers,
+          },
+        });
       }
 
       return NextResponse.next({
@@ -31,6 +42,10 @@ export async function middleware(request: NextRequest) {
     handleInvalidToken: async (reason) => {
       console.info("Missing or malformed credentials", { reason });
 
+      if (isPublicPath(request.nextUrl.pathname)) {
+        return NextResponse.next(); // ✅ allow guests on public paths
+      }
+
       return redirectToLogin(request, {
         path: "/login",
         publicPaths: PUBLIC_PATHS,
@@ -38,6 +53,10 @@ export async function middleware(request: NextRequest) {
     },
     handleError: async (error) => {
       console.error("Unhandled authentication error", { error });
+
+      if (isPublicPath(request.nextUrl.pathname)) {
+        return NextResponse.next();
+      }
 
       return redirectToLogin(request, {
         path: "/login",

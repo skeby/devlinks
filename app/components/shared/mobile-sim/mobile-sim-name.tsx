@@ -9,10 +9,12 @@ const MobileSimName = ({ skeleton, className, name }: Props) => {
   return (
     <div
       className={cn(
-        `rounded-[104px] h-4 w-[160px] ${
-          skeleton || !name ? "bg-[#EEEEEE]" : "bg-inherit"
+        `rounded-[104px] font-semibold text-grey-dark ${
+          skeleton && !name?.trim()
+            ? "h-4 w-[160px] bg-[#EEEEEE]"
+            : "bg-inherit"
         }`,
-        className
+        className,
       )}
     >
       {name}

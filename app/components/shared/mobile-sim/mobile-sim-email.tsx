@@ -9,10 +9,10 @@ const MobileSimEmail = ({ skeleton, className, name }: Props) => {
   return (
     <div
       className={cn(
-        `rounded-[104px] h-2 w-[72px] ${
-          skeleton || !name ? "bg-[#EEEEEE]" : "bg-inherit"
+        `rounded-[104px] text-sm text-grey ${
+          skeleton && !name ? "h-2 w-[72px] bg-[#EEEEEE]" : "bg-inherit"
         }`,
-        className
+        className,
       )}
     >
       {name}

@@ -6,22 +6,18 @@ import { Button, message } from "antd";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import {
-  FormProvider,
-  SubmitHandler,
-  useFieldArray,
-  useForm,
-} from "react-hook-form";
+import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import MobileSimEmail from "../components/shared/mobile-sim/mobile-sim-email";
 import MobileSimImage from "../components/shared/mobile-sim/mobile-sim-image";
 import MobileSimLink from "../components/shared/mobile-sim/mobile-sim-link";
 import MobileSimName from "../components/shared/mobile-sim/mobile-sim-name";
 import { platformOptions } from "../static";
-import { doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app, db } from "../firebase";
 import { FirebaseError } from "firebase/app";
+import FloppyDiskIcon from "../../public/icons/floppy-disk.svg";
 
 const LinkFieldsSchema = z.object({
   fields: z
@@ -107,9 +103,12 @@ const Links = () => {
 
       const userDocRef = doc(db, "users", user.uid);
 
-      await setDoc(userDocRef, { links: data.fields }, { merge: true });
+      await updateDoc(userDocRef, { links: data.fields });
 
-      message.success("Links saved successfully!");
+      message.success({
+        content: "Your changes have been successfully saved!",
+        icon: <FloppyDiskIcon />,
+      });
     } catch (e) {
       message.error("Failed to save links. Please try again.");
       if (e instanceof FirebaseError) {
@@ -128,6 +127,7 @@ const Links = () => {
       <section className="sticky top-20 flex h-fit w-[40%] justify-center gap-10 rounded-xl bg-white py-10">
         <div className="relative">
           <Image
+            priority
             src={"/images/phone-frame.svg"}
             width={307}
             height={631}
@@ -135,7 +135,7 @@ const Links = () => {
           />
           <div className="no-scrollbar absolute bottom-[53.5px] left-[34.5px] right-[35.5px] top-[63.5px] flex w-[237px] flex-col items-center justify-between gap-y-14 overflow-auto">
             <div className="flex w-full flex-col items-center">
-              <MobileSimImage skeleton className={`mb-[25px] size-24`} />
+              <MobileSimImage skeleton className={`mb-[25px]`} />
               <MobileSimName skeleton className={`mb-[13px]`} />
               <MobileSimEmail skeleton />
             </div>
@@ -143,20 +143,13 @@ const Links = () => {
               {watchedFields
                 .filter((field) => field.platform) // Only include fields with a selected platform
                 .slice(0, 5) // Limit to 5 items
-                .map((field, index) => {
-                  const platform = platformOptions.find(
-                    (o) => o.value === field.platform,
-                  );
-                  return (
-                    <MobileSimLink
-                      key={index}
-                      title={platform?.label}
-                      color={platform?.color}
-                      icon={platform?.icon}
-                      href={field.link}
-                    />
-                  );
-                })}
+                .map((field, index) => (
+                  <MobileSimLink
+                    key={index}
+                    href={field.link}
+                    platform={field.platform}
+                  />
+                ))}
               {Array.from({
                 length:
                   5 - watchedFields.filter((field) => field.platform).length,
