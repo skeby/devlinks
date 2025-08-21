@@ -5,14 +5,23 @@ import { useTokens } from "@/app/context/tokens";
 import { Button, message } from "antd";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import React from "react";
-import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import {
+  FormProvider,
+  SubmitHandler,
+  useFieldArray,
+  useForm,
+} from "react-hook-form";
 import { z } from "zod";
 import MobileSimEmail from "../components/shared/mobile-sim/mobile-sim-email";
 import MobileSimImage from "../components/shared/mobile-sim/mobile-sim-image";
 import MobileSimLink from "../components/shared/mobile-sim/mobile-sim-link";
 import MobileSimName from "../components/shared/mobile-sim/mobile-sim-name";
 import { platformOptions } from "../static";
+import { doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { app, db } from "../firebase";
+import { FirebaseError } from "firebase/app";
 
 const LinkFieldsSchema = z.object({
   fields: z
@@ -28,7 +37,7 @@ const LinkFieldsSchema = z.object({
       {
         message: "Please check the URL",
         path: ["link"],
-      }
+      },
     )
     .array(),
 });
@@ -37,12 +46,45 @@ export type LinkFields = z.infer<typeof LinkFieldsSchema>;
 
 const Links = () => {
   const tokens = useTokens();
-  const { control, handleSubmit, watch } = useForm<LinkFields>({
+  const form = useForm<LinkFields>({
     resolver: zodResolver(LinkFieldsSchema),
     defaultValues: {
       fields: [],
     },
   });
+
+  const { control, handleSubmit, watch, reset, getValues } = form;
+
+  useEffect(() => {
+    const auth = getAuth(app);
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const userDocRef = doc(db, "users", user.uid);
+
+        const unsubscribeDoc = onSnapshot(userDocRef, (snap) => {
+          if (snap.exists()) {
+            const data = snap.data();
+            const firestoreLinks = data.links || [];
+
+            // Get current form state
+            const currentLinks = getValues("fields");
+
+            // Only reset if values are different
+            if (
+              JSON.stringify(firestoreLinks) !== JSON.stringify(currentLinks)
+            ) {
+              reset({ fields: firestoreLinks });
+            }
+          }
+        });
+
+        return () => unsubscribeDoc();
+      }
+    });
+
+    return () => unsubscribeAuth();
+  }, [reset, getValues]);
 
   const { fields, append, remove } = useFieldArray<LinkFields>({
     control,
@@ -50,14 +92,40 @@ const Links = () => {
   });
 
   const watchedFields = watch("fields");
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit: SubmitHandler<LinkFields> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<LinkFields> = async (data) => {
+    setLoading(true);
+    try {
+      const auth = getAuth(app);
+      const user = auth.currentUser;
+
+      if (!user) {
+        message.error("User not logged in");
+        return;
+      }
+
+      const userDocRef = doc(db, "users", user.uid);
+
+      await setDoc(userDocRef, { links: data.fields }, { merge: true });
+
+      message.success("Links saved successfully!");
+    } catch (e) {
+      message.error("Failed to save links. Please try again.");
+      if (e instanceof FirebaseError) {
+        console.error(e.message);
+      } else {
+        console.error("Error saving links:", e);
+      }
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="flex relative gap-x-6 px-6 flex-1 pb-6">
-      <section className="bg-white sticky top-20 h-fit rounded-xl w-[40%] flex justify-center gap-10 py-10">
+    <div className="relative flex flex-1 gap-x-6 px-6 pb-6">
+      <section className="sticky top-20 flex h-fit w-[40%] justify-center gap-10 rounded-xl bg-white py-10">
         <div className="relative">
           <Image
             src={"/images/phone-frame.svg"}
@@ -65,19 +133,19 @@ const Links = () => {
             height={631}
             alt="phone frame"
           />
-          <div className="w-[237px] absolute top-[63.5px] bottom-[53.5px] left-[34.5px] right-[35.5px] flex flex-col justify-between items-center gap-y-14 no-scrollbar overflow-auto">
-            <div className="flex items-center flex-col w-full">
+          <div className="no-scrollbar absolute bottom-[53.5px] left-[34.5px] right-[35.5px] top-[63.5px] flex w-[237px] flex-col items-center justify-between gap-y-14 overflow-auto">
+            <div className="flex w-full flex-col items-center">
               <MobileSimImage skeleton className={`mb-[25px] size-24`} />
               <MobileSimName skeleton className={`mb-[13px]`} />
               <MobileSimEmail skeleton />
             </div>
-            <div className="flex flex-col gap-y-5 w-full">
+            <div className="flex w-full flex-col gap-y-5">
               {watchedFields
                 .filter((field) => field.platform) // Only include fields with a selected platform
                 .slice(0, 5) // Limit to 5 items
                 .map((field, index) => {
                   const platform = platformOptions.find(
-                    (o) => o.value === field.platform
+                    (o) => o.value === field.platform,
                   );
                   return (
                     <MobileSimLink
@@ -99,14 +167,14 @@ const Links = () => {
           </div>
         </div>
       </section>
-      <section className="bg-white rounded-xl w-[60%]">
+      <section className="w-[60%] rounded-xl bg-white">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="h-full flex flex-col"
+          className="flex h-full flex-col"
         >
-          <div className="p-10 flex-grow flex flex-col gap-y-10 justify-between">
+          <div className="flex flex-grow flex-col justify-between gap-y-10 p-10">
             <div>
-              <p className="mb-2 heading-m text-grey-dark">
+              <p className="heading-m mb-2 text-grey-dark">
                 Customize your links
               </p>
               <p className="body-m text-grey">
@@ -114,9 +182,9 @@ const Links = () => {
                 with the world!
               </p>
             </div>
-            <div className="flex flex-col gap-y-6 flex-1">
+            <div className="flex flex-1 flex-col gap-y-6">
               <Button
-                className="heading-s !text-primary !h-auto !py-[11px] !px-[27px] !border-primary hover:!bg-primary-light hover:!border-primary hover:!text-primary"
+                className="heading-s !h-auto !border-primary !px-[27px] !py-[11px] !text-primary hover:!border-primary hover:!bg-primary-light hover:!text-primary"
                 onClick={() => {
                   if (fields.length === 5) {
                     message.error("You can only add up to 5 links.");
@@ -127,9 +195,9 @@ const Links = () => {
               >
                 + Add a new link
               </Button>
-              <div className="h-full overflow-auto flex flex-col gap-y-6">
+              <div className="flex h-full flex-col gap-y-6 overflow-auto">
                 {fields.length === 0 ? (
-                  <div className="h-full rounded-xl bg-grey-light px-5 py-[62.5px] flex justify-center items-center flex-col">
+                  <div className="flex h-full flex-col items-center justify-center rounded-xl bg-grey-light px-5 py-[62.5px]">
                     <Image
                       alt="get started image"
                       width={250}
@@ -137,7 +205,7 @@ const Links = () => {
                       src={"/images/links-get-started.svg"}
                     />
                     <div className="text-center">
-                      <p className="mb-6 heading-m text-grey-dark">
+                      <p className="heading-m mb-6 text-grey-dark">
                         Let&apos;s get you started
                       </p>
                       <p className="body-m text-grey">
@@ -154,7 +222,7 @@ const Links = () => {
                       <LinkField
                         index={index}
                         key={field.id}
-                        platform={field.platform}
+                        platform={watchedFields[index].platform}
                         control={control}
                         onRemove={() => remove(index)}
                       />
@@ -164,12 +232,13 @@ const Links = () => {
               </div>
             </div>
           </div>
-          <div className="py-6 px-10 border-t border-[#D9D9D9]">
+          <div className="border-t border-[#D9D9D9] px-10 py-6">
             <Button
+              loading={loading}
               htmlType="submit"
               type="primary"
-              disabled={false}
-              className="float-right !h-auto !py-[11px] !px-[27px] heading-s !rounded-lg disabled:!bg-[#633CFF40] disabled:!text-white"
+              disabled={loading}
+              className="heading-s float-right !h-auto !rounded-lg !px-[27px] !py-[11px] disabled:!bg-[#633CFF40] disabled:!text-white"
             >
               Save
             </Button>

@@ -9,11 +9,30 @@ interface Props extends InputProps {
 }
 
 const Input = (props: Props) => {
-  const { label, className, classNames, error, suffix, ...rest } = props;
+  const {
+    label,
+    className,
+    classNames,
+    error,
+    suffix,
+    rootClassName,
+    ...rest
+  } = props;
 
   return (
-    <div className="body-s flex flex-col gap-y-1 text-grey-dark">
-      {label && <span className="text-xs">{label}</span>}
+    <div
+      className={cn(
+        "body-s flex flex-col gap-y-1 text-grey-dark",
+        rootClassName,
+      )}
+    >
+      {label && (
+        <span
+          className={`text-xs ${error ? "text-[#FF3939]" : "text-grey-dark"}`}
+        >
+          {label}
+        </span>
+      )}
       <AntInput
         classNames={{
           ...classNames,
@@ -32,7 +51,7 @@ const Input = (props: Props) => {
           error ? (
             <span className="body-s text-[#FF3939]">{error}</span>
           ) : (
-            suffix
+            suffix || <span />
           )
         }
         {...rest}

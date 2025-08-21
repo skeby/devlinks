@@ -21,6 +21,7 @@ export const theme: ThemeConfig = {
       primaryShadow: "none",
       colorPrimaryHover: "#BEADFF",
       colorBgContainerDisabled: "#BEADFF",
+      controlHeight: 48,
     },
     Select: {
       // colorTextPlaceholder: "#77878F",

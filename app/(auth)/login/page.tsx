@@ -12,6 +12,7 @@ import { app } from "@/app/firebase";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import useAppRouter from "@/app/hooks/useAppRouter";
+import { FirebaseError } from "firebase/app";
 
 const LoginSchema = z.object({
   email: z
@@ -46,7 +47,7 @@ const Login = () => {
       const credential = await signInWithEmailAndPassword(
         getAuth(app),
         data.email,
-        data.password
+        data.password,
       );
       const idToken = await credential.user.getIdToken();
 
@@ -58,7 +59,12 @@ const Login = () => {
 
       message.success("Login successful", 1).then(() => router.push("/"));
     } catch (e) {
-      message.error((e as Error).message);
+      if (e instanceof FirebaseError) {
+        message.error(e.message);
+      } else {
+        message.error("Something went wrong");
+      }
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -114,12 +120,12 @@ const Login = () => {
         htmlType="submit"
         // form="auth-form"
         type="primary"
-        className="!p-3 !h-[46px] heading-s !rounded-lg"
+        className="heading-s !h-[46px] !rounded-lg !p-3"
         // onClick={handleSubmit(onSubmit)}
       >
         Login
       </Button>
-      <p className="text-center body-m">
+      <p className="body-m text-center">
         <span className="text-grey">Don&apos;t have an account?</span>
         <Link href={"/register"} className="text-primary">
           {" "}

@@ -28,9 +28,6 @@ const PlatformOptionLabel = ({
 );
 
 const LinkField = ({ control, index, onRemove, platform }: Props) => {
-  const platformOption = platformOptions.find(
-    (option) => option.value === platform,
-  );
   return (
     <div className="flex flex-col gap-y-3 rounded-xl bg-grey-light p-5">
       <div className="flex items-center justify-between text-grey">
@@ -93,6 +90,10 @@ const LinkField = ({ control, index, onRemove, platform }: Props) => {
             <Input
               name="link"
               value={value}
+              placeholder={
+                platformOptions.find((option) => option.value === platform)
+                  ?.hint || ""
+              }
               onChange={onChange}
               error={error?.message || undefined}
               prefix={

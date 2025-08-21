@@ -1,8 +1,15 @@
 "use client";
 
-import LinkField from "@/app/components/shared/link-field";
 import { useTokens } from "@/app/context/tokens";
-import { Button, message } from "antd";
+import {
+  Button,
+  GetProp,
+  message,
+  Upload,
+  UploadFile,
+  UploadProps,
+} from "antd";
+import ImgCrop from "antd-img-crop";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { ImageIcon } from "@phosphor-icons/react";
@@ -19,30 +26,100 @@ import MobileSimLink from "@/app/components/shared/mobile-sim/mobile-sim-link";
 import MobileSimName from "@/app/components/shared/mobile-sim/mobile-sim-name";
 import { platformOptions } from "@/app/static";
 import Input from "@/app/components/shared/input";
+import { RcFile } from "antd/es/upload";
+import { useState } from "react";
 
 const ProfileDetailsSchema = z.object({
+  profilePicture: z.string().optional(),
   firstName: z.string().min(1, { message: "Can't be empty" }),
   lastName: z.string().min(1, { message: "Can't be empty" }),
   email: z.string().optional(),
 });
 
 type ProfileDetailsFields = z.infer<typeof ProfileDetailsSchema>;
+type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 const Settings = () => {
   const tokens = useTokens();
-  const { control, handleSubmit, watch } = useForm<ProfileDetailsFields>({
-    resolver: zodResolver(ProfileDetailsSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-    },
-  });
+  const { control, handleSubmit, watch, setValue } =
+    useForm<ProfileDetailsFields>({
+      resolver: zodResolver(ProfileDetailsSchema),
+      defaultValues: {
+        firstName: "",
+        lastName: "",
+        email: "",
+      },
+    });
+  const profilePicture = watch("profilePicture");
 
   const fields = [] as any[];
 
   const onSubmit: SubmitHandler<ProfileDetailsFields> = (data) => {
     console.log(data);
+  };
+
+  const onImagePreview = async (file: UploadFile) => {
+    let src = file.url as string;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file.originFileObj as FileType);
+        reader.onload = () => resolve(reader.result as string);
+      });
+    }
+    if (typeof window !== "undefined") {
+      const image = new window.Image();
+      image.src = src;
+      const imgWindow = window.open(src);
+      imgWindow?.document.write(image.outerHTML);
+    }
+  };
+
+  const beforeImageUpload = async (
+    file: RcFile,
+    fileList: RcFile[],
+  ): Promise<void | boolean | string | Blob | File> => {
+    const maxSize = 2.5 * 1024 * 1024; // 2.5 MB in bytes
+    const allowedTypes = ["image/png", "image/jpeg"];
+
+    if (!allowedTypes.includes(file.type)) {
+      message.error("Only PNG or JPEG images are allowed");
+      return false;
+    }
+
+    if (file.size > maxSize) {
+      message.error("Maximum allowed image size is 2.5mb");
+      return false;
+    }
+
+    // Check image dimensions
+    const isValidDimensions = await new Promise<boolean>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new window.Image();
+        img.onload = () => {
+          console.log(`${img.width}x${img.height}`);
+          resolve(true);
+
+          // if (img.width > 1024 || img.height > 1024) {
+          //   message.error("Image must be below 1024x1024px");
+          //   resolve(false);
+          // } else {
+          //   resolve(true);
+          // }
+        };
+        img.onerror = () => resolve(false);
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    if (isValidDimensions) {
+      const blobUrl = URL.createObjectURL(file);
+      setValue("profilePicture", blobUrl);
+    }
+
+    return isValidDimensions;
   };
 
   return (
@@ -107,12 +184,58 @@ const Settings = () => {
                 </label>
                 <div className="flex items-center gap-6">
                   {/* Upload buton */}
-                  <Button className="flex !size-[193px] shrink-0 flex-col items-center justify-center gap-y-2 rounded-xl !border-none !bg-[#EFEBFF]">
-                    <ImageIcon className="size-10 text-primary" />
-                    <span className="heading-s text-base font-semibold text-primary">
-                      + Upload Image
-                    </span>
-                  </Button>
+                  <ImgCrop
+                    modalCancel="Go back"
+                    modalOk="Continue"
+                    rotationSlider
+                  >
+                    {/* TODO: Try to show a loader when image is uploading */}
+                    <Upload
+                      fileList={[
+                        {
+                          url: profilePicture,
+                          name: "Profile picture",
+                          uid: "profile-picture",
+                        },
+                      ]}
+                      name="file"
+                      accept="png,jpg,jpeg"
+                      multiple={false}
+                      // action={`${API_BASE_URL}${paths.upload}`}
+                      onPreview={onImagePreview}
+                      beforeUpload={beforeImageUpload}
+                      // headers={{
+                      //   Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`,
+                      // }}
+                      showUploadList={false}
+                      maxCount={1}
+                    >
+                      <Button className="relative !size-[193px] shrink-0 rounded-xl !border-none !bg-[#EFEBFF]">
+                        {profilePicture && (
+                          <>
+                            <Image
+                              alt="Profile picture"
+                              src={profilePicture}
+                              width={193}
+                              height={193}
+                              className="absolute inset-0 rounded-xl object-cover"
+                            />
+                            <div className="absolute inset-0 rounded-xl bg-black/50"></div>
+                          </>
+                        )}
+                        <div className="absolute left-0 top-0 flex h-full w-full flex-col items-center justify-center gap-y-2">
+                          <ImageIcon
+                            className={`size-10 ${profilePicture ? "text-white" : "text-primary"}`}
+                          />
+                          <span
+                            className={`heading-s text-base font-semibold ${profilePicture ? "text-white" : "text-primary"}`}
+                          >
+                            + {profilePicture ? "Change" : "Upload"} Image
+                          </span>
+                        </div>
+                      </Button>
+                    </Upload>
+                  </ImgCrop>
                   <div className="body-s text-xs text-grey">
                     <p>Image must be below 1024x1024px.</p>
                     <p>Use PNG or JPG format.</p>
@@ -137,6 +260,51 @@ const Settings = () => {
                         onChange={onChange}
                         error={error?.message || undefined}
                         className="body-m"
+                        rootClassName="w-full"
+                      />
+                    )}
+                  />
+                </div>
+                <div className="flex items-center gap-x-4">
+                  <label className="body-m w-full max-w-[240px] text-grey">
+                    Last name*
+                  </label>
+                  <Controller
+                    name="lastName"
+                    control={control}
+                    render={({
+                      field: { value, onChange },
+                      fieldState: { error },
+                    }) => (
+                      <Input
+                        name="lastName"
+                        value={value}
+                        onChange={onChange}
+                        error={error?.message || undefined}
+                        className="body-m"
+                        rootClassName="w-full"
+                      />
+                    )}
+                  />
+                </div>
+                <div className="flex items-center gap-x-4">
+                  <label className="body-m w-full max-w-[240px] text-grey">
+                    Email
+                  </label>
+                  <Controller
+                    name="email"
+                    control={control}
+                    render={({
+                      field: { value, onChange },
+                      fieldState: { error },
+                    }) => (
+                      <Input
+                        name="email"
+                        value={value}
+                        onChange={onChange}
+                        error={error?.message || undefined}
+                        className="body-m"
+                        rootClassName="w-full"
                       />
                     )}
                   />
@@ -146,6 +314,7 @@ const Settings = () => {
           </div>
           <div className="border-t border-[#D9D9D9] px-10 py-6">
             <Button
+              loading={false}
               htmlType="submit"
               type="primary"
               disabled={false}
