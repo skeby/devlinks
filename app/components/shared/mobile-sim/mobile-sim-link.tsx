@@ -49,7 +49,7 @@ const MobileSimLink = ({
                 src={IconComponent.src}
                 width={IconComponent.width}
                 height={IconComponent.height}
-                className="text-white"
+                className="text-white forced-colors:text-white"
               />
             ) : (
               <IconComponent className="text-white" />
