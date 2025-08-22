@@ -66,7 +66,7 @@ const Navbar = () => {
           </Link>
           <Button
             type="primary"
-            className="!h-[46px] !w-[46px] !rounded-lg !px-3.5"
+            className="!h-[46px] !w-[46px] !rounded-lg !bg-[#FF3939] !px-3.5"
             onClick={handleLogout}
           >
             <SignOutIcon size={24} weight="bold" />
