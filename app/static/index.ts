@@ -1,17 +1,17 @@
-import GithubIcon from "../../public/icons/github.svg";
-import FrontendMentorIcon from "../../public/icons/frontend-mentor.svg";
-import TwitterIcon from "../../public/icons/twitter.svg";
-import LinkedInIcon from "../../public/icons/linkedin.svg";
-import YouTubeIcon from "../../public/icons/youtube.svg";
-import FacebookIcon from "../../public/icons/facebook.svg";
-import TwitchIcon from "../../public/icons/twitch.svg";
-// import DevToIcon from "../../public/icons/dev.to.svg";
-import CodewarsIcon from "../../public/icons/codewars.svg";
-import CodepenIcon from "../../public/icons/codepen.svg";
-import FreecodecampIcon from "../../public/icons/freecodecamp.svg";
-import GitlabIcon from "../../public/icons/gitlab.svg";
-import HashnodeIcon from "../../public/icons/hashnode.svg";
-import StackOverflowIcon from "../../public/icons/stack-overflow.svg";
+import GithubIcon from "@/app/assets/icons/github.svg";
+import FrontendMentorIcon from "@/app/assets/icons/frontend-mentor.svg";
+import TwitterIcon from "@/app/assets/icons/twitter.svg";
+import LinkedInIcon from "@/app/assets/icons/linkedin.svg";
+import YouTubeIcon from "@/app/assets/icons/youtube.svg";
+import FacebookIcon from "@/app/assets/icons/facebook.svg";
+import TwitchIcon from "@/app/assets/icons/twitch.svg";
+// import DevToIcon from "@/app/assets/icons/dev.to.svg";
+import CodewarsIcon from "@/app/assets/icons/codewars.svg";
+import CodepenIcon from "@/app/assets/icons/codepen.svg";
+import FreecodecampIcon from "@/app/assets/icons/freecodecamp.svg";
+import GitlabIcon from "@/app/assets/icons/gitlab.svg";
+import HashnodeIcon from "@/app/assets/icons/hashnode.svg";
+import StackOverflowIcon from "@/app/assets/icons/stack-overflow.svg";
 
 export const platformOptions = [
   {

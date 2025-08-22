@@ -1,7 +1,6 @@
 "use client";
 
 import LinkField from "@/app/components/shared/link-field";
-import { useTokens } from "@/app/context/tokens";
 import { Button, message } from "antd";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
@@ -32,7 +31,7 @@ import {
   restrictToParentElement,
   restrictToVerticalAxis,
 } from "@dnd-kit/modifiers";
-import FloppyDiskIcon from "../../public/icons/floppy-disk.svg";
+import FloppyDiskIcon from "@/app/assets/icons/floppy-disk.svg";
 
 const LinkFieldsSchema = z.object({
   fields: z
@@ -56,7 +55,6 @@ const LinkFieldsSchema = z.object({
 export type LinkFields = z.infer<typeof LinkFieldsSchema>;
 
 const Links = () => {
-  const tokens = useTokens();
   const form = useForm<LinkFields>({
     resolver: zodResolver(LinkFieldsSchema),
     defaultValues: {

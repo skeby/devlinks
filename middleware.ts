@@ -40,8 +40,6 @@ export async function middleware(request: NextRequest) {
       });
     },
     handleInvalidToken: async (reason) => {
-      console.info("Missing or malformed credentials", { reason });
-
       if (isPublicPath(request.nextUrl.pathname)) {
         return NextResponse.next(); // ✅ allow guests on public paths
       }
@@ -69,7 +67,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/",
-    "/((?!api|_next/static|_next/image|favicon.ico|u/.*).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|icons|u/.*).*)",
     "/api/login",
     "/api/logout",
   ],

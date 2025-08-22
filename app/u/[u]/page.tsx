@@ -14,8 +14,7 @@ const UserProfilePage = async ({ params }: { params: Promise<Params> }) => {
   const snapshot = await getDoc(docRef);
 
   if (!snapshot.exists()) {
-    message.error("User not found", Infinity);
-    return null;
+    return <p className="text-center">User not found</p>;
   }
 
   const userData = snapshot.data() as {
@@ -25,6 +24,8 @@ const UserProfilePage = async ({ params }: { params: Promise<Params> }) => {
     profilePicture?: string;
     links: LinkFields["fields"];
   };
+
+  console.log("userData", userData);
 
   return (
     <main className="relative mx-auto flex h-full min-h-screen w-full max-w-[1440px] flex-col bg-grey-light pb-20">

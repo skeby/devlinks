@@ -28,7 +28,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app, db, storage } from "@/app/firebase";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import FloppyDiskIcon from "../../../public/icons/floppy-disk.svg";
+import FloppyDiskIcon from "@/app/assets/icons/floppy-disk.svg";
 
 const ProfileDetailsSchema = z.object({
   profilePicture: z.string().optional(),

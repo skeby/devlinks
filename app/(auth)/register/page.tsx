@@ -141,7 +141,7 @@ const SignUp = () => {
       />
 
       <p className="body-s text-grey">
-        Password must contains at least 8 characters
+        Password must contain at least 8 characters
       </p>
 
       {/* TODO: Fix background color on hover */}

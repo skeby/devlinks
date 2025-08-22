@@ -1,14 +1,25 @@
 "use client";
 
-import { useTokens } from "@/app/context/tokens";
 import { LinkIcon } from "@phosphor-icons/react";
 import { Button, message } from "antd";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Logo from "../shared/logo";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import { app } from "@/app/firebase";
 
 const ProfileNavbar = ({ u }: { u: string }) => {
-  const tokens = useTokens();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(getAuth(app), (firebaseUser) => {
+      setUser(firebaseUser);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleLinkShare = () => {
     navigator.clipboard.writeText(`${window.origin}/u/${u}`).then(() =>
@@ -22,7 +33,9 @@ const ProfileNavbar = ({ u }: { u: string }) => {
   return (
     <nav className="sticky top-0 z-20 p-6">
       <div className="flex items-center justify-between rounded-xl bg-white p-4 pl-6 shadow-[0px_0px_12px_0px_#0000001A]">
-        {tokens ? (
+        {isLoading ? (
+          <span />
+        ) : user ? (
           <Link href="/" className="">
             <Button className="heading-s !h-[46px] !rounded-lg border !border-primary px-[27px] py-[9px] !text-base !font-semibold !text-primary">
               Back to Editor

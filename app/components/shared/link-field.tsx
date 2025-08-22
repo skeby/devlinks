@@ -19,17 +19,29 @@ interface Props {
 }
 
 const PlatformOptionLabel = ({
-  text,
+  label,
   icon: IconComponent,
 }: {
-  text: string;
+  label: string;
   icon: any;
-}) => (
-  <div className="flex h-6 items-center gap-x-3">
-    <IconComponent className="text-grey" />
-    <span className="">{text}</span>
-  </div>
-);
+}) => {
+  return (
+    <div className="flex h-6 items-center gap-x-3">
+      {typeof IconComponent === "object" ? (
+        <Image
+          alt={`${label} icon`}
+          src={IconComponent.src}
+          width={IconComponent.width}
+          height={IconComponent.height}
+          className="text-grey"
+        />
+      ) : (
+        <IconComponent className="text-grey" />
+      )}
+      <span className="">{label}</span>
+    </div>
+  );
+};
 
 const LinkField = ({ control, index, id, onRemove, platform }: Props) => {
   const {
@@ -99,7 +111,10 @@ const LinkField = ({ control, index, id, onRemove, platform }: Props) => {
               label="Platform"
               options={platformOptions.map((option) => ({
                 label: (
-                  <PlatformOptionLabel text={option.label} icon={option.icon} />
+                  <PlatformOptionLabel
+                    label={option.label}
+                    icon={option.icon}
+                  />
                 ),
                 value: option.value,
               }))}
