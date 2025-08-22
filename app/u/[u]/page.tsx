@@ -1,13 +1,12 @@
 import ProfileNavbar from "@/app/components/layout/profile-navbar";
 import { Params } from "../../types";
-import Image from "next/image";
 import { LinkFields } from "@/app/(main)/page";
 import MobileSimLink from "@/app/components/shared/mobile-sim/mobile-sim-link";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/app/firebase";
 import { Avatar, message } from "antd";
 
-const UserProfilePage = async ({ params }: { params: Params }) => {
+const UserProfilePage = async ({ params }: { params: Promise<Params> }) => {
   const u = (await params)?.u;
 
   // Fetch user doc from Firestore

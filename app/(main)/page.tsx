@@ -17,6 +17,21 @@ import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app, db } from "../firebase";
 import { FirebaseError } from "firebase/app";
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
+import {
+  restrictToParentElement,
+  restrictToVerticalAxis,
+} from "@dnd-kit/modifiers";
 import FloppyDiskIcon from "../../public/icons/floppy-disk.svg";
 
 const LinkFieldsSchema = z.object({
@@ -82,13 +97,32 @@ const Links = () => {
     return () => unsubscribeAuth();
   }, [reset, getValues]);
 
-  const { fields, append, remove } = useFieldArray<LinkFields>({
+  const { fields, append, remove, move } = useFieldArray<LinkFields>({
     control,
     name: "fields",
   });
 
+  const mouseSensor = useSensor(MouseSensor);
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 100,
+      tolerance: 5,
+    },
+  });
+  const keyboardSensor = useSensor(KeyboardSensor);
+  const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
+
   const watchedFields = watch("fields");
   const [loading, setLoading] = useState(false);
+
+  const onDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!active || !over || active.id === over.id) {
+      return;
+    }
+    const oldIndex = fields.findIndex((item) => item.id === active.id);
+    const newIndex = fields.findIndex((item) => item.id === over?.id);
+    move(oldIndex, newIndex);
+  };
 
   const onSubmit: SubmitHandler<LinkFields> = async (data) => {
     setLoading(true);
@@ -210,17 +244,31 @@ const Links = () => {
                     </div>
                   </div>
                 ) : (
-                  <>
-                    {fields.map((field, index) => (
-                      <LinkField
-                        index={index}
-                        key={field.id}
-                        platform={watchedFields[index].platform}
-                        control={control}
-                        onRemove={() => remove(index)}
-                      />
-                    ))}
-                  </>
+                  <DndContext
+                    collisionDetection={closestCenter}
+                    sensors={sensors}
+                    onDragEnd={onDragEnd}
+                    modifiers={[
+                      restrictToVerticalAxis,
+                      restrictToParentElement,
+                    ]}
+                  >
+                    <SortableContext
+                      items={fields}
+                      strategy={rectSortingStrategy}
+                    >
+                      {fields.map((field, index) => (
+                        <LinkField
+                          key={field.id}
+                          index={index}
+                          id={field.id}
+                          platform={watchedFields[index].platform}
+                          control={control}
+                          onRemove={() => remove(index)}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
                 )}
               </div>
             </div>

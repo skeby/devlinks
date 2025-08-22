@@ -1,5 +1,8 @@
 import Image from "next/image";
 import Input from "./input";
+import { CSSProperties } from "react";
+import { CSS } from "@dnd-kit/utilities";
+import { useSortable } from "@dnd-kit/sortable";
 import { LinkIcon } from "@phosphor-icons/react";
 import Select from "./select";
 import { Control, Controller } from "react-hook-form";
@@ -8,6 +11,7 @@ import { ConfigProvider } from "antd";
 import { platformOptions } from "@/app/static";
 
 interface Props {
+  id: string;
   index: number;
   platform: string;
   control: Control<LinkFields, any>;
@@ -27,18 +31,41 @@ const PlatformOptionLabel = ({
   </div>
 );
 
-const LinkField = ({ control, index, onRemove, platform }: Props) => {
+const LinkField = ({ control, index, id, onRemove, platform }: Props) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    isDragging,
+    transform,
+    transition,
+  } = useSortable({ id });
+  const style: CSSProperties = {
+    transition,
+    transform: isDragging
+      ? `${CSS.Transform.toString(transform)} scale(1.01)`
+      : CSS.Transform.toString(transform),
+    zIndex: isDragging ? 1 : 0,
+    opacity: isDragging ? 0.5 : 1,
+  };
   return (
-    <div className="flex flex-col gap-y-3 rounded-xl bg-grey-light p-5">
+    <div
+      key={id}
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className="flex flex-col gap-y-3 rounded-xl bg-grey-light p-5"
+    >
       <div className="flex items-center justify-between text-grey">
         <div className="flex items-center gap-x-2">
-          <Image
-            width={12}
-            height={6}
-            src="/icons/drag-handle.svg"
-            alt="drag handle"
-            className="my-[9px] cursor-move"
-          />
+          <button {...listeners} className="cursor-move px-2 py-[9px]">
+            <Image
+              width={12}
+              height={6}
+              src="/icons/drag-handle.svg"
+              alt="drag handle"
+            />
+          </button>
           <p className="font-bold leading-6">Link #{index + 1}</p>
         </div>
         <p className="body-m cursor-pointer" onClick={onRemove}>
