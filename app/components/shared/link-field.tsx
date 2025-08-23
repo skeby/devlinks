@@ -27,18 +27,8 @@ const PlatformOptionLabel = ({
 }) => {
   return (
     <div className="flex h-6 items-center gap-x-3">
-      {typeof IconComponent === "object" ? (
-        <Image
-          alt={`${label} icon`}
-          src={IconComponent.src}
-          width={IconComponent.width}
-          height={IconComponent.height}
-          className="text-grey forced-colors:text-grey"
-        />
-      ) : (
-        <IconComponent className="text-grey" />
-      )}
-      <span className="">{label}</span>
+      <IconComponent className="text-grey" />
+      <span>{label}</span>
     </div>
   );
 };

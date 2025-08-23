@@ -1,3 +1,5 @@
+"use client";
+
 import GithubIcon from "@/app/assets/icons/github.svg";
 import FrontendMentorIcon from "@/app/assets/icons/frontend-mentor.svg";
 import TwitterIcon from "@/app/assets/icons/twitter.svg";
