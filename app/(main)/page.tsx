@@ -95,7 +95,7 @@ const Links = () => {
     return () => unsubscribeAuth();
   }, [reset, getValues]);
 
-  const { fields, append, remove, move } = useFieldArray<LinkFields>({
+  const { fields, prepend, remove, move } = useFieldArray<LinkFields>({
     control,
     name: "fields",
   });
@@ -214,7 +214,7 @@ const Links = () => {
                   if (fields.length === 5) {
                     message.error("You can only add up to 5 links.");
                   } else {
-                    append({ platform: "", link: "" });
+                    prepend({ platform: "", link: "" });
                   }
                 }}
               >
