@@ -64,6 +64,8 @@ const Links = () => {
 
   const { control, handleSubmit, watch, reset, getValues } = form;
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const auth = getAuth(app);
 
@@ -111,7 +113,6 @@ const Links = () => {
   const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor);
 
   const watchedFields = watch("fields");
-  const [loading, setLoading] = useState(false);
 
   const onDragEnd = ({ active, over }: DragEndEvent) => {
     if (!active || !over || active.id === over.id) {
@@ -155,8 +156,8 @@ const Links = () => {
   };
 
   return (
-    <div className="relative flex flex-1 gap-x-6 px-6 pb-6">
-      <section className="sticky top-20 flex h-fit w-[40%] justify-center gap-10 rounded-xl bg-white py-10">
+    <div className="relative flex flex-1 gap-x-6 p-4 sm:p-6 sm:pt-0">
+      <section className="sticky top-[126px] hidden h-fit w-[40%] justify-center gap-10 rounded-xl bg-white py-10 lg:flex">
         <div className="relative">
           <Image
             priority
@@ -164,6 +165,7 @@ const Links = () => {
             width={307}
             height={631}
             alt="phone frame"
+            className="w-full max-w-[307px]"
           />
           <div className="no-scrollbar absolute bottom-[53.5px] left-[34.5px] right-[35.5px] top-[63.5px] flex w-[237px] flex-col items-center justify-between gap-y-14 overflow-auto">
             <div className="flex w-full flex-col items-center">
@@ -192,14 +194,14 @@ const Links = () => {
           </div>
         </div>
       </section>
-      <section className="w-[60%] rounded-xl bg-white">
+      <section className="w-full rounded-xl bg-white lg:w-[60%]">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="flex h-full flex-col"
         >
-          <div className="flex flex-grow flex-col justify-between gap-y-10 p-10">
+          <div className="flex flex-grow flex-col justify-between gap-y-10 p-6 sm:p-10">
             <div>
-              <p className="heading-m mb-2 text-grey-dark">
+              <p className="heading-m mb-2 text-2xl text-grey-dark sm:text-[32px]">
                 Customize your links
               </p>
               <p className="body-m text-grey">
@@ -209,7 +211,7 @@ const Links = () => {
             </div>
             <div className="flex flex-1 flex-col gap-y-6">
               <Button
-                className="heading-s !h-auto !border-primary !px-[27px] !py-[11px] !text-primary hover:!border-primary hover:!bg-primary-light hover:!text-primary"
+                className="heading-s !h-[46px] !border-primary !px-[27px] !py-[11px] !text-primary hover:!border-primary hover:!bg-primary-light hover:!text-primary"
                 onClick={() => {
                   if (fields.length === 5) {
                     message.error("You can only add up to 5 links.");
@@ -222,15 +224,16 @@ const Links = () => {
               </Button>
               <div className="flex h-full flex-col gap-y-6 overflow-auto">
                 {fields.length === 0 ? (
-                  <div className="flex h-full flex-col items-center justify-center rounded-xl bg-grey-light px-5 py-[62.5px]">
+                  <div className="flex h-full flex-col items-center justify-center gap-6 rounded-xl bg-grey-light px-5 py-[46.5px] sm:gap-10 sm:py-[62.5px]">
                     <Image
-                      alt="get started image"
-                      width={250}
-                      height={160}
+                      alt="Get started image"
+                      width={125}
+                      height={80}
                       src={"/images/links-get-started.svg"}
+                      className="sm:h-[160px] sm:w-[250px]"
                     />
                     <div className="text-center">
-                      <p className="heading-m mb-6 text-grey-dark">
+                      <p className="heading-m mb-6 text-2xl text-grey-dark sm:text-[32px]">
                         Let&apos;s get you started
                       </p>
                       <p className="body-m text-grey">
@@ -271,13 +274,13 @@ const Links = () => {
               </div>
             </div>
           </div>
-          <div className="border-t border-[#D9D9D9] px-10 py-6">
+          <div className="border-t border-[#D9D9D9] p-4 sm:px-10 sm:py-6">
             <Button
               loading={loading}
               htmlType="submit"
               type="primary"
-              disabled={loading}
-              className="heading-s float-right !h-auto !rounded-lg !px-[27px] !py-[11px] disabled:!bg-[#633CFF40] disabled:!text-white"
+              disabled={fields.length === 0}
+              className="heading-s !h-auto !w-full !rounded-lg !px-[27px] !py-[11px] disabled:!bg-[#633CFF40] disabled:!text-white sm:float-right sm:!w-auto"
             >
               Save
             </Button>

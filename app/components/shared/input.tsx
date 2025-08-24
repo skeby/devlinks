@@ -6,6 +6,7 @@ import { Input as AntInput, InputProps } from "antd";
 interface Props extends InputProps {
   label?: string;
   error?: string;
+  labelClassName?: string;
 }
 
 const Input = (props: Props) => {
@@ -16,6 +17,7 @@ const Input = (props: Props) => {
     error,
     suffix,
     rootClassName,
+    labelClassName,
     ...rest
   } = props;
 
@@ -28,7 +30,10 @@ const Input = (props: Props) => {
     >
       {label && (
         <span
-          className={`text-xs ${error ? "text-[#FF3939]" : "text-grey-dark"}`}
+          className={cn(
+            `text-xs ${error ? "text-[#FF3939]" : "text-grey-dark"}`,
+            labelClassName,
+          )}
         >
           {label}
         </span>

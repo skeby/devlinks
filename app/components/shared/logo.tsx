@@ -1,11 +1,14 @@
+import { cn } from "@/app/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 
 interface Props {
+  iconClassName?: string;
+  textClassName?: string;
   variant?: "small" | "default";
 }
 
-const Logo = ({ variant = "default" }: Props) => {
+const Logo = ({ iconClassName, textClassName, variant = "default" }: Props) => {
   return (
     <Link
       href={"/"}
@@ -19,6 +22,7 @@ const Logo = ({ variant = "default" }: Props) => {
         width={variant === "default" ? 40 : 32}
         height={variant === "default" ? 40 : 32}
         priority
+        className={cn("", iconClassName)}
       />
       <Image
         src="/icons/logo-text.svg"
@@ -26,6 +30,7 @@ const Logo = ({ variant = "default" }: Props) => {
         width={variant === "default" ? 135 : 108}
         height={variant === "default" ? 26.25 : 21}
         priority
+        className={cn("", textClassName)}
       />
     </Link>
   );

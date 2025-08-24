@@ -193,15 +193,15 @@ const Settings = () => {
     if (isValidDimensions) {
       const blobUrl = URL.createObjectURL(file);
       setValue("profilePicture", blobUrl);
-      setNewProfileFile(file); // 👈 store file for later upload
+      setNewProfileFile(file); // store file for later upload
     }
 
     return false;
   };
 
   return (
-    <div className="relative flex flex-1 gap-x-6 px-6 pb-6">
-      <section className="sticky top-20 flex h-fit w-[40%] justify-center gap-10 rounded-xl bg-white py-10">
+    <div className="relative flex flex-1 gap-x-6 p-4 sm:p-6 sm:pt-0">
+      <section className="sticky top-[126px] hidden h-fit w-[40%] justify-center gap-10 rounded-xl bg-white py-10 lg:flex">
         <div className="relative">
           <Image
             priority
@@ -244,24 +244,26 @@ const Settings = () => {
           </div>
         </div>
       </section>
-      <section className="w-[60%] rounded-xl bg-white">
+      <section className="w-full rounded-xl bg-white lg:w-[60%]">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="flex h-full flex-col"
         >
-          <div className="flex flex-grow flex-col justify-between gap-y-10 p-10">
+          <div className="flex flex-grow flex-col justify-between gap-y-10 p-6 sm:p-10">
             <div>
-              <p className="heading-m mb-2 text-grey-dark">Profile Details</p>
+              <p className="heading-m mb-2 text-2xl text-grey-dark sm:text-[32px]">
+                Profile Details
+              </p>
               <p className="body-m text-grey">
                 Add your details to create a personal touch to your profile.
               </p>
             </div>
             <div className="flex flex-1 flex-col gap-y-6">
-              <div className="flex items-center gap-x-4 p-5">
-                <label className="body-m w-full max-w-[240px] text-grey">
+              <div className="flex flex-col gap-4 rounded-xl bg-grey-light p-5 sm:flex-row sm:items-center">
+                <label className="body-m w-full shrink-0 text-grey sm:w-[240px]">
                   Profile picture
                 </label>
-                <div className="flex items-center gap-6">
+                <div className="flex flex-col gap-6">
                   {/* Upload buton */}
                   <ImgCrop
                     modalCancel="Go back"
@@ -316,15 +318,14 @@ const Settings = () => {
                       </Button>
                     </Upload>
                   </ImgCrop>
-                  <div className="body-s text-xs text-grey">
-                    <p>Image must be below 1024x1024px.</p>
-                    <p>Use PNG or JPG format.</p>
-                  </div>
+                  <p className="body-s text-wrap text-xs text-grey">
+                    Image must be below 1024x1024px. Use PNG or JPG format.
+                  </p>
                 </div>
               </div>
-              <div className="flex flex-col gap-y-3 p-5">
+              <div className="flex flex-col gap-y-3 rounded-xl bg-grey-light p-5">
                 <div className="flex items-center gap-x-4">
-                  <label className="body-m w-full max-w-[240px] text-grey">
+                  <label className="body-m hidden w-full max-w-[240px] text-grey sm:block">
                     First name*
                   </label>
                   <Controller
@@ -336,17 +337,19 @@ const Settings = () => {
                     }) => (
                       <Input
                         name="firstName"
+                        label="First name*"
                         value={value}
                         onChange={onChange}
                         error={error?.message || undefined}
                         className="body-m"
                         rootClassName="w-full"
+                        labelClassName="sm:hidden block"
                       />
                     )}
                   />
                 </div>
                 <div className="flex items-center gap-x-4">
-                  <label className="body-m w-full max-w-[240px] text-grey">
+                  <label className="body-m hidden w-full max-w-[240px] text-grey sm:block">
                     Last name*
                   </label>
                   <Controller
@@ -358,17 +361,19 @@ const Settings = () => {
                     }) => (
                       <Input
                         name="lastName"
+                        label="Last name*"
                         value={value}
                         onChange={onChange}
                         error={error?.message || undefined}
                         className="body-m"
                         rootClassName="w-full"
+                        labelClassName="sm:hidden block"
                       />
                     )}
                   />
                 </div>
                 <div className="flex items-center gap-x-4">
-                  <label className="body-m w-full max-w-[240px] text-grey">
+                  <label className="body-m hidden w-full max-w-[240px] text-grey sm:block">
                     Email
                   </label>
                   <Controller
@@ -381,11 +386,13 @@ const Settings = () => {
                       <Input
                         disabled
                         name="email"
+                        label="Email"
                         value={value}
                         onChange={onChange}
                         error={error?.message || undefined}
                         className="body-m"
                         rootClassName="w-full"
+                        labelClassName="sm:hidden block"
                       />
                     )}
                   />
@@ -393,13 +400,13 @@ const Settings = () => {
               </div>
             </div>
           </div>
-          <div className="border-t border-[#D9D9D9] px-10 py-6">
+          <div className="border-t border-[#D9D9D9] p-4 sm:px-10 sm:py-6">
             <Button
               loading={loading}
               htmlType="submit"
               type="primary"
               disabled={false}
-              className="heading-s float-right !h-auto !rounded-lg !px-[27px] !py-[11px] disabled:!bg-[#633CFF40] disabled:!text-white"
+              className="heading-s !h-auto !w-full !rounded-lg !px-[27px] !py-[11px] disabled:!bg-[#633CFF40] disabled:!text-white sm:float-right sm:!w-auto"
             >
               Save
             </Button>

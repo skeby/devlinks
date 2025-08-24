@@ -2,7 +2,7 @@
 
 import { cn } from "@/app/lib/utils";
 import { MobileSimProps } from ".";
-import { ArrowRightIcon } from "@phosphor-icons/react";
+import ArrowRightIcon from "@/app/assets/icons/arrow-right.svg";
 import { platformOptions } from "@/app/static";
 
 interface Props extends MobileSimProps {

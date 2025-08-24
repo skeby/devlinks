@@ -26,10 +26,10 @@ const UserProfilePage = async ({ params }: { params: Promise<Params> }) => {
   };
 
   return (
-    <main className="relative mx-auto flex h-full min-h-screen w-full max-w-[1440px] flex-col bg-grey-light pb-20">
+    <main className="relative mx-auto flex h-full min-h-screen w-full max-w-[1440px] flex-col bg-white pb-20 sm:bg-grey-light">
       <ProfileNavbar u={u as string} />
-      <div className="absolute inset-0 h-[350px] w-full rounded-b-[32px] bg-primary"></div>
-      <div className="relative z-10 mx-auto mt-[82px] w-[350px] space-y-14 rounded-3xl bg-white px-14 py-12 shadow-[0px_0px_32px_0px_#0000001A]">
+      <div className="absolute inset-0 hidden h-[357px] w-full rounded-b-[32px] bg-primary sm:block"></div>
+      <div className="z-10 mx-auto mt-[60px] w-full max-w-[350px] space-y-14 rounded-3xl bg-white px-10 shadow-none min-[400px]:px-14 sm:mt-[102px] sm:py-12 sm:shadow-[0px_0px_32px_0px_#0000001A] lg:mt-[82px]">
         <div className="flex flex-col items-center gap-y-[25px] text-center">
           <Avatar
             alt="User profile"

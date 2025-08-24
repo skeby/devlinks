@@ -31,8 +31,8 @@ const ProfileNavbar = ({ u }: { u: string }) => {
   };
 
   return (
-    <nav className="sticky top-0 z-20 p-6">
-      <div className="flex items-center justify-between rounded-xl bg-white p-4 pl-6 shadow-[0px_0px_12px_0px_#0000001A]">
+    <nav className="sticky top-0 z-20 p-0 sm:p-6">
+      <div className="flex items-center justify-between gap-4 rounded-xl bg-white p-4 pl-6 shadow-none sm:shadow-[0px_0px_12px_0px_#0000001A]">
         {isLoading ? (
           <span />
         ) : user ? (

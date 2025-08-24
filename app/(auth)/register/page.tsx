@@ -17,7 +17,7 @@ import { FirebaseError } from "firebase/app";
 
 const SignUpSchema = z
   .object({
-    email: z.string().email().min(1, { message: "Can't be empty" }),
+    email: z.string().min(1, { message: "Can't be empty" }).email(),
     password: z.string().min(1, { message: "Can't be empty" }),
     confirmPassword: z.string().min(8, { message: "Can't be empty" }),
   })
@@ -153,7 +153,7 @@ const SignUp = () => {
       >
         Create new account
       </Button>
-      <p className="body-m text-center">
+      <p className="body-m flex flex-col text-center sm:block">
         <span className="text-grey">Already have an account?</span>
         <Link href={"/login"} className="text-primary">
           {" "}

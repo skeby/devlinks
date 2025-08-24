@@ -125,7 +125,7 @@ const Login = () => {
       >
         Login
       </Button>
-      <p className="body-m text-center">
+      <p className="body-m flex flex-col text-center sm:block">
         <span className="text-grey">Don&apos;t have an account?</span>
         <Link href={"/register"} className="text-primary">
           {" "}
