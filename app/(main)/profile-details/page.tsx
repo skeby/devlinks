@@ -210,7 +210,7 @@ const Settings = () => {
             height={631}
             alt="phone frame"
           />
-          <div className="no-scrollbar absolute bottom-[53.5px] left-[34.5px] right-[35.5px] top-[63.5px] flex w-[237px] flex-col items-center justify-between gap-y-14 overflow-auto">
+          <div className="no-scrollbar absolute bottom-[53.5px] left-[34.5px] right-[35.5px] top-[63.5px] flex w-[237px] flex-col items-center justify-between gap-y-14 overflow-y-auto">
             <div className="flex w-full flex-col items-center">
               <MobileSimImage
                 skeleton={!profilePicture}
@@ -226,8 +226,7 @@ const Settings = () => {
             </div>
             <div className="flex w-full flex-col gap-y-5">
               {fields
-                .filter((field) => field.platform) // Only include fields with a selected platform
-                .slice(0, 5) // Limit to 5 items
+                .filter((field) => field.platform) // only include filled links
                 .map((field, index) => (
                   <MobileSimLink
                     key={index}
@@ -235,11 +234,12 @@ const Settings = () => {
                     platform={field.platform}
                   />
                 ))}
-              {Array.from({
-                length: 5 - fields.filter((field) => field.platform).length,
-              }).map((_, index) => (
-                <MobileSimLink key={`skeleton-${index}`} skeleton />
-              ))}
+              {fields.filter((field) => field.platform).length < 5 &&
+                Array.from({
+                  length: 5 - fields.filter((field) => field.platform).length,
+                }).map((_, index) => (
+                  <MobileSimLink key={`skeleton-${index}`} skeleton />
+                ))}
             </div>
           </div>
         </div>
@@ -260,7 +260,7 @@ const Settings = () => {
             </div>
             <div className="flex flex-1 flex-col gap-y-6">
               <div className="flex flex-col gap-4 rounded-xl bg-grey-light p-5 sm:flex-row sm:items-center">
-                <label className="body-m w-full shrink-0 text-grey sm:w-[240px]">
+                <label className="body-m w-full shrink-0 text-grey sm:w-[180px] md:w-[240px]">
                   Profile picture
                 </label>
                 <div className="flex flex-col gap-6">
@@ -325,7 +325,7 @@ const Settings = () => {
               </div>
               <div className="flex flex-col gap-y-3 rounded-xl bg-grey-light p-5">
                 <div className="flex items-center gap-x-4">
-                  <label className="body-m hidden w-full max-w-[240px] text-grey sm:block">
+                  <label className="body-m hidden w-full text-grey sm:block sm:max-w-[180px] md:max-w-[240px]">
                     First name*
                   </label>
                   <Controller
@@ -349,7 +349,7 @@ const Settings = () => {
                   />
                 </div>
                 <div className="flex items-center gap-x-4">
-                  <label className="body-m hidden w-full max-w-[240px] text-grey sm:block">
+                  <label className="body-m hidden w-full text-grey sm:block sm:max-w-[180px] md:max-w-[240px]">
                     Last name*
                   </label>
                   <Controller
@@ -373,7 +373,7 @@ const Settings = () => {
                   />
                 </div>
                 <div className="flex items-center gap-x-4">
-                  <label className="body-m hidden w-full max-w-[240px] text-grey sm:block">
+                  <label className="body-m hidden w-full text-grey sm:block sm:max-w-[180px] md:max-w-[240px]">
                     Email
                   </label>
                   <Controller

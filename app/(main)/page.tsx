@@ -30,6 +30,7 @@ import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import {
   restrictToParentElement,
   restrictToVerticalAxis,
+  snapCenterToCursor,
 } from "@dnd-kit/modifiers";
 import FloppyDiskIcon from "@/app/assets/icons/floppy-disk.svg";
 
@@ -64,7 +65,7 @@ const Links = () => {
 
   const { control, handleSubmit, watch, reset, getValues } = form;
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const auth = getAuth(app);
@@ -165,9 +166,8 @@ const Links = () => {
             width={307}
             height={631}
             alt="phone frame"
-            className="w-full max-w-[307px]"
           />
-          <div className="no-scrollbar absolute bottom-[53.5px] left-[34.5px] right-[35.5px] top-[63.5px] flex w-[237px] flex-col items-center justify-between gap-y-14 overflow-auto">
+          <div className="no-scrollbar absolute bottom-[53.5px] left-[34.5px] right-[35.5px] top-[63.5px] flex w-[237px] flex-col items-center justify-between gap-y-14 overflow-y-auto">
             <div className="flex w-full flex-col items-center">
               <MobileSimImage skeleton className={`mb-[25px]`} />
               <MobileSimName skeleton className={`mb-[13px]`} />
@@ -175,8 +175,7 @@ const Links = () => {
             </div>
             <div className="flex w-full flex-col gap-y-5">
               {watchedFields
-                .filter((field) => field.platform) // Only include fields with a selected platform
-                .slice(0, 5) // Limit to 5 items
+                .filter((field) => field.platform) // only include filled links
                 .map((field, index) => (
                   <MobileSimLink
                     key={index}
@@ -184,12 +183,13 @@ const Links = () => {
                     platform={field.platform}
                   />
                 ))}
-              {Array.from({
-                length:
-                  5 - watchedFields.filter((field) => field.platform).length,
-              }).map((_, index) => (
-                <MobileSimLink key={`skeleton-${index}`} skeleton />
-              ))}
+              {watchedFields.filter((field) => field.platform).length < 5 &&
+                Array.from({
+                  length:
+                    5 - watchedFields.filter((field) => field.platform).length,
+                }).map((_, index) => (
+                  <MobileSimLink key={`skeleton-${index}`} skeleton />
+                ))}
             </div>
           </div>
         </div>
@@ -213,16 +213,16 @@ const Links = () => {
               <Button
                 className="heading-s !h-[46px] !border-primary !px-[27px] !py-[11px] !text-primary hover:!border-primary hover:!bg-primary-light hover:!text-primary"
                 onClick={() => {
-                  if (fields.length === 5) {
-                    message.error("You can only add up to 5 links.");
-                  } else {
-                    prepend({ platform: "", link: "" });
-                  }
+                  // if (fields.length === 5) {
+                  //   message.error("You can only add up to 5 links.");
+                  // } else {
+                  prepend({ platform: "", link: "" });
+                  // }
                 }}
               >
                 + Add a new link
               </Button>
-              <div className="flex h-full flex-col gap-y-6 overflow-auto">
+              <div className="flex h-full flex-col gap-y-6">
                 {fields.length === 0 ? (
                   <div className="flex h-full flex-col items-center justify-center gap-6 rounded-xl bg-grey-light px-5 py-[46.5px] sm:gap-10 sm:py-[62.5px]">
                     <Image
@@ -251,7 +251,8 @@ const Links = () => {
                     onDragEnd={onDragEnd}
                     modifiers={[
                       restrictToVerticalAxis,
-                      restrictToParentElement,
+                      // restrictToParentElement,
+                      // snapCenterToCursor,
                     ]}
                   >
                     <SortableContext

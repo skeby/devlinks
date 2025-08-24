@@ -18,7 +18,7 @@ const MobileSimLink = ({
 }: Props) => {
   if (skeleton)
     return (
-      <div className="h-11 w-full rounded-lg bg-[#EEEEEE] px-4 py-3.5"></div>
+      <div className="h-11 w-full shrink-0 rounded-lg bg-[#EEEEEE] px-4 py-3.5"></div>
     );
   const platformOption = platformOptions.find((o) => o.value === platform);
   const IconComponent = platformOption?.icon;
@@ -35,7 +35,7 @@ const MobileSimLink = ({
         backgroundColor: color,
       }}
       className={cn(
-        "h-11 w-full rounded-lg px-4 py-3.5 text-xs text-white",
+        "h-11 w-full shrink-0 rounded-lg px-4 py-3.5 text-xs text-white",
         className,
       )}
     >
