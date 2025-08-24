@@ -57,7 +57,11 @@ const Login = () => {
         },
       });
 
-      message.success("Login successful", 1).then(() => router.push("/"));
+      message.success("Login successful", 1).then(() => {
+        if (typeof window !== "undefined") {
+          window.location.href = "/";
+        }
+      });
     } catch (e) {
       if (e instanceof FirebaseError) {
         message.error(e.message);
