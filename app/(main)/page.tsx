@@ -217,6 +217,7 @@ const Links = () => {
                   //   message.error("You can only add up to 5 links.");
                   // } else {
                   prepend({ platform: "", link: "" });
+                  message.success("New link added");
                   // }
                 }}
               >
