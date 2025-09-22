@@ -26,7 +26,7 @@ const MobileSimLink = ({
   const title = platformOption?.label;
   return (
     <a
-      href={href || ""}
+      href={href ? (href.startsWith("www") ? `https://${href}` : href) : ""}
       onClick={(e) => {
         if (!href) e.preventDefault();
       }}

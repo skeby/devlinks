@@ -29,6 +29,7 @@ import { app, db, storage } from "@/app/firebase";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import FloppyDiskIcon from "@/app/assets/icons/floppy-disk.svg";
+import nprogress from "nprogress";
 
 const ProfileDetailsSchema = z.object({
   profilePicture: z.string().optional(),
@@ -59,9 +60,10 @@ const Settings = () => {
 
   const [fields, setFields] = useState<LinkFields["fields"]>([]);
   const [newProfileFile, setNewProfileFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [isSavePending, setIsSavePending] = useState(false);
 
   useEffect(() => {
+    nprogress.start();
     const auth = getAuth(app);
 
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -83,20 +85,27 @@ const Settings = () => {
             setValue("firstName", data.firstName || "");
             setValue("lastName", data.lastName || "");
             setValue("email", data.email || "");
+            nprogress.done();
           }
         });
 
-        return () => unsubscribeDoc();
+        return () => {
+          unsubscribeDoc();
+          nprogress.done();
+        };
       }
     });
 
-    return () => unsubscribeAuth();
+    return () => {
+      unsubscribeAuth();
+      nprogress.done();
+    };
   }, [setValue]);
 
   const onSubmit: SubmitHandler<ProfileDetailsFields> = async (data) => {
     const decodedToken = tokens?.decodedToken;
     if (!decodedToken) return;
-    setLoading(true);
+    setIsSavePending(true);
 
     try {
       let photoURL = data.profilePicture;
@@ -133,7 +142,7 @@ const Settings = () => {
     } catch (err: any) {
       message.error(err.message);
     } finally {
-      setLoading(false);
+      setIsSavePending(false);
     }
   };
 
@@ -402,7 +411,7 @@ const Settings = () => {
           </div>
           <div className="border-t border-[#D9D9D9] p-4 sm:px-10 sm:py-6">
             <Button
-              loading={loading}
+              loading={isSavePending}
               htmlType="submit"
               type="primary"
               disabled={false}

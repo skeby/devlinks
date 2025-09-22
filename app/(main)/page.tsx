@@ -33,25 +33,42 @@ import {
   snapCenterToCursor,
 } from "@dnd-kit/modifiers";
 import FloppyDiskIcon from "@/app/assets/icons/floppy-disk.svg";
+import nprogress from "nprogress";
 
-const LinkFieldsSchema = z.object({
-  fields: z
-    .object({
-      platform: z.string().min(1, { message: "Can't be empty" }),
-      link: z.string().min(1, { message: "Can't be empty" }),
-    })
-    .refine(
-      (field) =>
-        platformOptions
-          .find((option) => option.value === field.platform)
-          ?.regex.test(field.link) || false,
-      {
-        message: "Please check the URL",
-        path: ["link"],
-      },
-    )
-    .array(),
-});
+const LinkFieldsSchema = z
+  .object({
+    fields: z
+      .object({
+        platform: z.string().min(1, { message: "Can't be empty" }),
+        link: z.string().min(1, { message: "Can't be empty" }),
+      })
+      .refine(
+        (field) =>
+          platformOptions
+            .find((option) => option.value === field.platform)
+            ?.regex.test(field.link) || false,
+        {
+          message: "Please check the URL",
+          path: ["link"],
+        },
+      )
+      .array(),
+  })
+  .superRefine((data, ctx) => {
+    const seen = new Set<string>();
+    data.fields.forEach((field, index) => {
+      const key = `${field.platform}-${field.link}`;
+      if (seen.has(key)) {
+        ctx.addIssue({
+          code: "custom",
+          message: "You've already added this link",
+          path: ["fields", index, "link"], // highlight the link field
+        });
+      } else {
+        seen.add(key);
+      }
+    });
+  });
 
 export type LinkFields = z.infer<typeof LinkFieldsSchema>;
 
@@ -61,13 +78,16 @@ const Links = () => {
     defaultValues: {
       fields: [],
     },
+    shouldFocusError: true,
   });
 
   const { control, handleSubmit, watch, reset, getValues } = form;
 
-  const [loading, setLoading] = useState(false);
+  const [isSavePending, setSavePending] = useState(false);
 
   useEffect(() => {
+    nprogress.start();
+
     const auth = getAuth(app);
 
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -88,14 +108,21 @@ const Links = () => {
             ) {
               reset({ fields: firestoreLinks });
             }
+            nprogress.done();
           }
         });
 
-        return () => unsubscribeDoc();
+        return () => {
+          unsubscribeDoc();
+          nprogress.done();
+        };
       }
     });
 
-    return () => unsubscribeAuth();
+    return () => {
+      unsubscribeAuth();
+      nprogress.done();
+    };
   }, [reset, getValues]);
 
   const { fields, prepend, remove, move } = useFieldArray<LinkFields>({
@@ -125,7 +152,7 @@ const Links = () => {
   };
 
   const onSubmit: SubmitHandler<LinkFields> = async (data) => {
-    setLoading(true);
+    setSavePending(true);
     try {
       const auth = getAuth(app);
       const user = auth.currentUser;
@@ -150,9 +177,9 @@ const Links = () => {
       } else {
         console.error("Error saving links:", e);
       }
-      setLoading(false);
+      setSavePending(false);
     } finally {
-      setLoading(false);
+      setSavePending(false);
     }
   };
 
@@ -278,7 +305,7 @@ const Links = () => {
           </div>
           <div className="border-t border-[#D9D9D9] p-4 sm:px-10 sm:py-6">
             <Button
-              loading={loading}
+              loading={isSavePending}
               htmlType="submit"
               type="primary"
               disabled={fields.length === 0}

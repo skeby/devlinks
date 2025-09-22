@@ -59,6 +59,21 @@
   }
 } */
 
+/* Reset autofill styles */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important; /* match your background */
+  -webkit-text-fill-color: #000 !important; /* match your text color */
+  transition: background-color 5000s ease-in-out 0s; /* prevents flashing */
+}
+
 body {
   @apply bg-grey-light;
   color: rgb(var(--foreground-rgb));
