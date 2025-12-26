@@ -23,7 +23,7 @@
     "antd-img-crop": "^4.25.0",
     "clsx": "^2.1.1",
     "firebase": "^10.12.4",
-    "next": "15.4.7",
+    "next": "15.4.10",
     "next-firebase-auth-edge": "^1.6.2",
     "nextjs-toploader": "^1.6.12",
     "nprogress": "^0.2.0",
