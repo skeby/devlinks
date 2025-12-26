@@ -83,7 +83,7 @@ export async function generateMetadata({
   // Encode the Firebase URL so it can be passed as a query param
   const ogImageUrl = userData.profilePicture
     ? `${domain}/api/og-image?url=${encodeURIComponent(userData.profilePicture)}`
-    : `${domain}/icons/logo-icon.svg`; // Fallback image in your public folder
+    : `${domain}/icons/default-og.png`; // Fallback image in your public folder
 
   return {
     title: `${fullName} | DevLinks`,
