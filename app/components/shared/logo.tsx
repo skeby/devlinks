@@ -18,7 +18,7 @@ const Logo = ({ iconClassName, textClassName, variant = "default" }: Props) => {
     >
       <Image
         src="/icons/logo-icon.svg"
-        alt="devlinks "
+        alt="devlinks logo"
         width={variant === "default" ? 40 : 32}
         height={variant === "default" ? 40 : 32}
         priority

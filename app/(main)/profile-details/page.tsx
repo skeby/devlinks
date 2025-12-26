@@ -19,23 +19,46 @@ import MobileSimEmail from "@/app/components/shared/mobile-sim/mobile-sim-email"
 import MobileSimImage from "@/app/components/shared/mobile-sim/mobile-sim-image";
 import MobileSimLink from "@/app/components/shared/mobile-sim/mobile-sim-link";
 import MobileSimName from "@/app/components/shared/mobile-sim/mobile-sim-name";
-import { platformOptions } from "@/app/static";
 import Input from "@/app/components/shared/input";
 import { RcFile } from "antd/es/upload";
 import { useEffect, useState } from "react";
 import { LinkFields } from "../page";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app, db, storage } from "@/app/firebase";
-import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  onSnapshot,
+  updateDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  limit,
+} from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import FloppyDiskIcon from "@/app/assets/icons/floppy-disk.svg";
 import nprogress from "nprogress";
 
+/**
+ * 1. Appropriate length and content validation
+ * - We use regex to allow only alphanumeric characters and underscores (standard for URLs).
+ * - Min length of 3, max of 20 to prevent layout breaking or tiny usernames.
+ */
 const ProfileDetailsSchema = z.object({
   profilePicture: z.string().optional(),
   firstName: z.string().min(1, { message: "Can't be empty" }),
   lastName: z.string().min(1, { message: "Can't be empty" }),
   email: z.string().optional(),
+  username: z
+    .string()
+    .min(3, { message: "Username must be at least 3 characters" })
+    .max(20, { message: "Username must be less than 20 characters" })
+    .regex(/^[a-zA-Z0-9_]+$/, {
+      message: "Username can only contain letters, numbers, and underscores",
+    })
+    .toLowerCase() // Normalize to lowercase for URL consistency
+    .optional()
+    .or(z.literal("")), // Allow empty string if optional
 });
 
 type ProfileDetailsFields = z.infer<typeof ProfileDetailsSchema>;
@@ -43,13 +66,14 @@ type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
 const Settings = () => {
   const tokens = useTokens();
-  const { control, handleSubmit, watch, setValue } =
+  const { control, handleSubmit, watch, setValue, setError } =
     useForm<ProfileDetailsFields>({
       resolver: zodResolver(ProfileDetailsSchema),
       defaultValues: {
         firstName: "",
         lastName: "",
         email: "",
+        username: "",
       },
     });
 
@@ -57,6 +81,7 @@ const Settings = () => {
   const firstName = watch("firstName");
   const lastName = watch("lastName");
   const email = watch("email");
+  const username = watch("username");
 
   const [fields, setFields] = useState<LinkFields["fields"]>([]);
   const [newProfileFile, setNewProfileFile] = useState<File | null>(null);
@@ -64,43 +89,68 @@ const Settings = () => {
 
   useEffect(() => {
     nprogress.start();
-    const auth = getAuth(app);
+    // const auth = getAuth(app);
 
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const userDocRef = doc(db, "users", user.uid);
+    const uid = tokens?.decodedToken.uid;
 
-        const unsubscribeDoc = onSnapshot(userDocRef, (snap) => {
-          if (snap.exists()) {
-            const data = snap.data();
-            const firestoreLinks = data.links || [];
+    // const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+    if (uid) {
+      const userDocRef = doc(db, "users", uid);
 
-            // Only reset if values are different
-            if (JSON.stringify(firestoreLinks) !== JSON.stringify(fields)) {
-              setFields(firestoreLinks);
-            }
+      const unsubscribeDoc = onSnapshot(userDocRef, (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          const firestoreLinks = data.links || [];
 
-            // load profile picture & form values
-            setValue("profilePicture", data.profilePicture || "");
-            setValue("firstName", data.firstName || "");
-            setValue("lastName", data.lastName || "");
-            setValue("email", data.email || "");
-            nprogress.done();
+          if (JSON.stringify(firestoreLinks) !== JSON.stringify(fields)) {
+            setFields(firestoreLinks);
           }
-        });
 
-        return () => {
-          unsubscribeDoc();
+          setValue("profilePicture", data.profilePicture || "");
+          setValue("firstName", data.firstName || "");
+          setValue("lastName", data.lastName || "");
+          setValue("email", data?.email || "");
+          setValue("username", data?.username || "");
           nprogress.done();
-        };
-      }
-    });
+        }
+      });
 
-    return () => {
-      unsubscribeAuth();
-      nprogress.done();
-    };
+      return () => {
+        unsubscribeDoc();
+        nprogress.done();
+      };
+    }
+    // });
+
+    // return () => {
+    //   unsubscribeAuth();
+    //   nprogress.done();
+    // };
   }, [setValue]);
+
+  /**
+   * 2. Uniqueness Check Logic
+   */
+  const checkUsernameUnique = async (
+    newUsername: string,
+    currentUid: string,
+  ) => {
+    const usersRef = collection(db, "users");
+    // Search for documents where username matches the input
+    const q = query(
+      usersRef,
+      where("username", "==", newUsername.toLowerCase()),
+      limit(1),
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      // Check if the found user is NOT the current logged-in user
+      const existingUser = querySnapshot.docs[0];
+      return existingUser.id === currentUid;
+    }
+    return true; // Is unique
+  };
 
   const onSubmit: SubmitHandler<ProfileDetailsFields> = async (data) => {
     const decodedToken = tokens?.decodedToken;
@@ -108,37 +158,47 @@ const Settings = () => {
     setIsSavePending(true);
 
     try {
+      // ✅ Uniqueness Check
+      if (data.username) {
+        const isUnique = await checkUsernameUnique(
+          data.username,
+          decodedToken.uid,
+        );
+        if (!isUnique) {
+          setError("username", {
+            type: "manual",
+            message: "This username is already taken",
+          });
+          setIsSavePending(false);
+          return;
+        }
+      }
+
       let photoURL = data.profilePicture;
 
-      // 👇 Only upload if a new file is picked
       if (newProfileFile) {
-        // ✅ Always overwrite the same path, so old pic is replaced
         const storageRef = ref(
           storage,
           `users/${decodedToken.uid}/profile.jpg`,
         );
-
-        // Upload (overwrite if already exists)
         await uploadBytes(storageRef, newProfileFile);
-
-        // Get fresh download URL
         photoURL = await getDownloadURL(storageRef);
       }
 
-      // ✅ Update Firestore
       const userDocRef = doc(db, "users", decodedToken.uid);
       await updateDoc(userDocRef, {
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
         profilePicture: photoURL || null,
+        username: data.username?.toLowerCase() || null, // Always store lowercase
       });
 
       message.success({
         content: "Your changes have been successfully saved!",
         icon: <FloppyDiskIcon />,
       });
-      setNewProfileFile(null); // reset temp file
+      setNewProfileFile(null);
     } catch (err: any) {
       message.error(err.message);
     } finally {
@@ -167,7 +227,7 @@ const Settings = () => {
     file: RcFile,
     fileList: RcFile[],
   ): Promise<void | boolean | string | Blob | File> => {
-    const maxSize = 2.5 * 1024 * 1024; // 2.5 MB in bytes
+    const maxSize = 2.5 * 1024 * 1024;
     const allowedTypes = ["image/png", "image/jpeg"];
 
     if (!allowedTypes.includes(file.type)) {
@@ -180,7 +240,6 @@ const Settings = () => {
       return false;
     }
 
-    // Check image dimensions
     const isValidDimensions = await new Promise<boolean>((resolve) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -202,7 +261,7 @@ const Settings = () => {
     if (isValidDimensions) {
       const blobUrl = URL.createObjectURL(file);
       setValue("profilePicture", blobUrl);
-      setNewProfileFile(file); // store file for later upload
+      setNewProfileFile(file);
     }
 
     return false;
@@ -235,7 +294,7 @@ const Settings = () => {
             </div>
             <div className="flex w-full flex-col gap-y-5">
               {fields
-                .filter((field) => field.platform) // only include filled links
+                .filter((field) => field.platform)
                 .map((field, index) => (
                   <MobileSimLink
                     key={index}
@@ -273,13 +332,11 @@ const Settings = () => {
                   Profile picture
                 </label>
                 <div className="flex flex-col gap-6">
-                  {/* Upload buton */}
                   <ImgCrop
                     modalCancel="Go back"
                     modalOk="Continue"
                     rotationSlider
                   >
-                    {/* TODO: Try to show a loader when image is uploading */}
                     <Upload
                       fileList={[
                         {
@@ -291,12 +348,8 @@ const Settings = () => {
                       name="file"
                       accept="png,jpg,jpeg"
                       multiple={false}
-                      // action={`${API_BASE_URL}${paths.upload}`}
                       onPreview={onImagePreview}
                       beforeUpload={beforeImageUpload}
-                      // headers={{
-                      //   Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`,
-                      // }}
                       showUploadList={false}
                       maxCount={1}
                     >
@@ -333,6 +386,7 @@ const Settings = () => {
                 </div>
               </div>
               <div className="flex flex-col gap-y-3 rounded-xl bg-grey-light p-5">
+                {/* First Name */}
                 <div className="flex items-center gap-x-4">
                   <label className="body-m hidden w-full text-grey sm:block sm:max-w-[180px] md:max-w-[240px]">
                     First name*
@@ -357,6 +411,7 @@ const Settings = () => {
                     )}
                   />
                 </div>
+                {/* Last Name */}
                 <div className="flex items-center gap-x-4">
                   <label className="body-m hidden w-full text-grey sm:block sm:max-w-[180px] md:max-w-[240px]">
                     Last name*
@@ -381,6 +436,7 @@ const Settings = () => {
                     )}
                   />
                 </div>
+                {/* Email */}
                 <div className="flex items-center gap-x-4">
                   <label className="body-m hidden w-full text-grey sm:block sm:max-w-[180px] md:max-w-[240px]">
                     Email
@@ -406,6 +462,32 @@ const Settings = () => {
                     )}
                   />
                 </div>
+                {/* Username Input */}
+                <div className="flex items-center gap-x-4">
+                  <label className="body-m hidden w-full text-grey sm:block sm:max-w-[180px] md:max-w-[240px]">
+                    Username (Public Profile Link)
+                  </label>
+                  <Controller
+                    name="username"
+                    control={control}
+                    render={({
+                      field: { value, onChange },
+                      fieldState: { error },
+                    }) => (
+                      <Input
+                        name="username"
+                        label="Username"
+                        placeholder="e.g. john_doe"
+                        value={value}
+                        onChange={onChange}
+                        error={error?.message || undefined}
+                        className="body-m"
+                        rootClassName="w-full"
+                        labelClassName="sm:hidden block"
+                      />
+                    )}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -414,7 +496,6 @@ const Settings = () => {
               loading={isSavePending}
               htmlType="submit"
               type="primary"
-              disabled={false}
               className="heading-s !h-auto !w-full !rounded-lg !px-[27px] !py-[11px] disabled:!bg-[#633CFF40] disabled:!text-white sm:float-right sm:!w-auto"
             >
               Save

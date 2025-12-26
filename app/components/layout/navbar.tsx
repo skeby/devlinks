@@ -11,14 +11,38 @@ import { Button } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getAuth, signOut } from "firebase/auth";
-import { app } from "@/app/firebase";
+import { app, db } from "@/app/firebase";
 import useAppRouter from "@/app/hooks/useAppRouter";
 import { useTokens } from "@/app/context/tokens";
+import { useEffect, useState } from "react";
+import { doc, onSnapshot } from "firebase/firestore";
 
 const Navbar = () => {
   const tokens = useTokens();
   const pathname = usePathname();
   const router = useAppRouter();
+
+  // State to hold the preferred routing identifier (username or UID)
+  const [profileId, setProfileId] = useState<string>("");
+
+  useEffect(() => {
+    const uid = tokens?.decodedToken.uid;
+    if (!uid) return;
+
+    // Listen to user document changes to get the latest username
+    const userDocRef = doc(db, "users", uid);
+    const unsubscribe = onSnapshot(userDocRef, (doc) => {
+      if (doc.exists()) {
+        const data = doc.data();
+        // Priority: Use username if it exists, otherwise fallback to UID
+        setProfileId(data.username || uid);
+      } else {
+        setProfileId(uid);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [tokens?.decodedToken.uid]);
 
   const navLinks = [
     {
@@ -53,7 +77,7 @@ const Navbar = () => {
             return (
               <Link
                 key={i}
-                {...link}
+                href={link.href}
                 className={`heading-s flex h-[42px] items-center gap-x-2 px-[27px] py-[11px] duration-200 ease-in hover:text-primary sm:h-[46px] ${
                   isActive
                     ? "rounded-lg bg-primary-light text-primary"
@@ -68,7 +92,8 @@ const Navbar = () => {
         </div>
         <div className="flex items-center gap-x-2 sm:gap-x-4">
           <Link
-            href={`/u/${tokens?.decodedToken.uid || ""}`}
+            // Use the profileId (username or UID) dynamically
+            href={`/u/${profileId || tokens?.decodedToken.uid || ""}`}
             className="heading-s flex h-[42px] items-center justify-center rounded-lg border border-primary px-4 py-[11px] font-semibold text-primary sm:h-[46px] sm:px-[27px] sm:py-[9px]"
           >
             <EyeIcon
