@@ -76,6 +76,14 @@ export async function generateMetadata({
 
   const { userData } = result;
   const fullName = `${userData.firstName} ${userData.lastName}`;
+  // Use your production domain (absolute URL is required)
+  const domain =
+    process.env.NEXT_PUBLIC_DOMAIN || "https://devlinks-skeby.vercel.app";
+
+  // Encode the Firebase URL so it can be passed as a query param
+  const ogImageUrl = userData.profilePicture
+    ? `${domain}/api/og-image?url=${encodeURIComponent(userData.profilePicture)}`
+    : `${domain}/icons/logo-icon.svg`; // Fallback image in your public folder
 
   return {
     title: `${fullName} | DevLinks`,
@@ -83,13 +91,23 @@ export async function generateMetadata({
     openGraph: {
       title: `${fullName} - Profile Links`,
       description: `View ${fullName}'s professional links on DevLinks.`,
-      images: userData.profilePicture ? [userData.profilePicture] : [],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 600,
+          height: 600, // Explicitly tell crawlers it's a square
+          alt: `${fullName}'s Profile Picture`,
+        },
+      ],
+      type: "profile",
+      url: `https://devlinks-skeby.vercel.app/u/${u}`,
+      siteName: "DevLinks",
     },
     twitter: {
-      card: "summary_large_image",
+      card: "summary",
       title: `${fullName} | DevLinks`,
       description: `View ${fullName}'s professional links on DevLinks.`,
-      images: userData.profilePicture ? [userData.profilePicture] : [],
+      images: [ogImageUrl],
     },
   };
 }
