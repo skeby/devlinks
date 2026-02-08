@@ -14,8 +14,18 @@ import FreecodecampIcon from "@/app/assets/icons/freecodecamp.svg";
 import GitlabIcon from "@/app/assets/icons/gitlab.svg";
 import HashnodeIcon from "@/app/assets/icons/hashnode.svg";
 import StackOverflowIcon from "@/app/assets/icons/stack-overflow.svg";
+import WebsiteIcon from "@/app/assets/icons/website.svg";
 
 export const platformOptions = [
+  {
+    label: "Website",
+    value: "website",
+    icon: WebsiteIcon,
+    color: "#633CFF",
+    regex:
+      /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/,
+    hint: "https://www.example.com",
+  },
   {
     label: "GitHub",
     value: "github",
